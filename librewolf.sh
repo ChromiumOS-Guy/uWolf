@@ -20,4 +20,8 @@ os.environ["MOZ_USE_XINPUT2"] = "1"
 os.environ["GDK_SCALE"]=str(float(os.environ["GRID_UNIT_PX"])/8)
 os.environ["GTK_IM_MODULE"] = "Maliit"
 os.environ["GTK_IM_MODULE_FILE"] = "lib/@CLICK_ARCH@/gtk-3.0/3.0.0/immodules/immodules.cache"
+
+# Force Wayland
+# os.environ["MOZ_ENABLE_WAYLAND"] = "1"
+
 os.execlp("bin/librewolf","bin/librewolf")
