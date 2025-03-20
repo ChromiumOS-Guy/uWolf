@@ -1,5 +1,6 @@
 // librewolf
 pref('toolkit.legacyUserProfileCustomizations.stylesheets', true); // enable css customizations (trust me bro. ,style)
+pref('privacy.resistFingerprinting', false); // makes useragnet overrride possible on librewolf
 
 // privacy
 pref('dom.event.clipboardevents.enabled' , false); // no clipboards for grabby websites
