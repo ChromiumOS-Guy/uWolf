@@ -2,7 +2,16 @@
 
 A UT LibreWolf Wrapper for LibreWolf Firefox Based Browser.
 
-## License
+## Bugs
+scaling doesn't get applied for some reason,
+currently the only fix is to manually set it go to about:config
+and set this to 1.5
+
+``` layout.css.devPixelsPerPx ```
+
+
+
+### License
 
 Copyright (C) 2025  ChromiumOS-Guy
 

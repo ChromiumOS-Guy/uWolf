@@ -1,4 +1,5 @@
 // This file can be used to configure global preferences for Firefox
+
 // Example: Homepage
 pref("browser.urlbar.placeholderName", "DuckDuckGo");
 pref("browser.urlbar.placeholderName.private", "DuckDuckGo");
@@ -26,3 +27,4 @@ pref('toolkit.cosmeticAnimations.enabled', false);
 
 // Disable download animations, save CPU
 pref('browser.download.animateNotifications', false);
+

@@ -33,7 +33,6 @@ echo "--->managing files" >> $LOG_FILE
 /bin/cp $BUILD_DIR/* $INSTALL_DIR 2>/dev/null >> $LOG_FILE # copying leftovers
 
 /bin/mkdir -p ${INSTALL_DIR}/bin/browser/defaults/preferences/ >> $LOG_FILE # directory for syspref.js
-/bin/mv ${INSTALL_DIR}/syspref.js ${INSTALL_DIR}/bin/browser/defaults/preferences/syspref.js >> $LOG_FILE # copy syspref.js
 
 ## scripts
 echo "--->copying scripts" >> $LOG_FILE
@@ -52,5 +51,11 @@ if ! $BUILD_DIR/scripts/librewolf-d.sh >> $LOG_FILE; then # move app files to bu
 else
   echo "Successfully downloaded librewolf binaries!" >> $LOG_FILE
 fi
+
+# browser settings
+echo "---> copying browser settings" >> $LOG_FILE
+/bin/cp ${ROOT}/settings/syspref.js ${INSTALL_DIR}/bin/browser/defaults/preferences/syspref.js >> $LOG_FILE # copy syspref.js
+/bin/cp ${ROOT}/settings/custom-prefs.js ${INSTALL_DIR}/bin/browser/defaults/preferences/custom-prefs.js >> $LOG_FILE # copy custom-prefs.js
+/bin/cp ${ROOT}/settings/policies.json ${INSTALL_DIR}/bin/distribution/policies.json >> $LOG_FILE # copy policies.js
 
 exit 0
