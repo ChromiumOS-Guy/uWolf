@@ -17,7 +17,8 @@
 import os
 
 os.environ["MOZ_USE_XINPUT2"] = "1"
-#os.environ["GDK_SCALE"]=str(float(os.environ["GRID_UNIT_PX"]/8))
+#os.environ["GDK_SCALE"]=str(float(os.environ["GRID_UNIT_PX"]/8)) # old
+os.environ["GDK_DPI_SCALE"]=str(float(os.environ["GRID_UNIT_PX"])/12)
 os.environ["GTK_IM_MODULE"] = "Maliit"
 os.environ["GTK_IM_MODULE_FILE"] = "lib/@CLICK_ARCH@/gtk-3.0/3.0.0/immodules/immodules.cache"
 

@@ -14,7 +14,7 @@ pref("browser.theme.dark", true); // dark mode is best mode for mobile
 
 
 // UI Hacks
-pref('layout.css.devPixelsPerPx', 1.5); // the way to properly scale, 150%
+//pref('layout.css.devPixelsPerPx', 1.5); // the way to properly scale, 150% (not needed anymore)
 pref('nglayout.initialpaint.delay', 0); // display page after 0ms
 pref('ui.submenuDelay', 0); // disable menu delay (the delay will be added back in software acceleration lag)
 pref("ui.prefersReducedMotion" , 1); // reduce animation
