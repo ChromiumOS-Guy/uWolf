@@ -2,8 +2,8 @@
 
 A UT LibreWolf Wrapper for LibreWolf Firefox Based Browser.
 
-## Bugs
-please open an issue and let me know!
+if the browser is too small or too big please send me the output of this:
+```echo $GRID_UNIT_PX```  with device name as issue 
 
 ### License
 
