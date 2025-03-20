@@ -1,0 +1,15 @@
+{
+    "name": "uwolf.chromiumos-guy",
+    "description": "A UT LibreWolf Wrapper for LibreWolf Firefox Based Browser.",
+    "architecture": "@CLICK_ARCH@",
+    "title": "uWolf",
+    "hooks": {
+        "uwolf": {
+            "apparmor": "uwolf.apparmor",
+            "desktop":  "uwolf.desktop"
+        }
+    },
+    "version": "0.0.1",
+    "maintainer": "ChromiumOS-Guy <email@domain.org>",
+    "framework" : "@CLICK_FRAMEWORK@"
+}
