@@ -107,11 +107,11 @@ jobs:
       - name: Determine if Build is Needed and New uWolf App Version
         id: determine_build_info
         run: |
-          GITLAB_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}" # e.g., v138.0.4-1
-          LAST_PROCESSED_LW_TAG="${{ steps.get_last_processed_lw_tag.outputs.last_processed_lw_tag }}" # e.g., v0.0.0 or v138.0.4-1
-          LAST_RELEASED_APP_TAG="${{ steps.get_github_app_tag.outputs.github_app_tag }}" # e.g., v0.0.0 or v0.2.3
-          CURRENT_APP_VERSION_RAW="${{ steps.get_current_app_version.outputs.current_app_version }}" # e.g., 0.2.3
-          CURRENT_APP_VERSION_WITH_V="v$CURRENT_APP_VERSION_RAW" # e.g., v0.2.3
+          GITLAB_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}" 
+          LAST_PROCESSED_LW_TAG="${{ steps.get_last_processed_lw_tag.outputs.last_processed_lw_tag }}" 
+          LAST_RELEASED_APP_TAG="${{ steps.get_github_app_tag.outputs.github_app_tag }}" 
+          CURRENT_APP_VERSION_RAW="${{ steps.get_current_app_version.outputs.current_app_version }}" 
+          CURRENT_APP_VERSION_WITH_V="v$CURRENT_APP_VERSION_RAW" 
 
           NEW_UWOOLF_APP_VERSION_RAW="$CURRENT_APP_VERSION_RAW" # Proposed new version for manifest.json
           SHOULD_BUILD=false
@@ -152,7 +152,7 @@ jobs:
           fi
 
           # Decide if we need to build based on the correct logic
-          if [ "$NEWER_LIBREWOLF_AVAILABLE" = true ]; then
+          if [ "$NEWER_LIBREWOLF_AVAILABLE" == true ]; then
             SHOULD_BUILD=true
             echo "Reason to build: Newer LibreWolf version is available ($GITLAB_TAG)."
             # If current app version matches the last *released* app tag, increment patch
