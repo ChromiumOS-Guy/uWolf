@@ -1,4 +1,4 @@
-name: Monitor LibreWolf and Create uWolf Alpha Release
+name: Monitor LibreWolf and Create uWolf Release
 
 on:
   schedule:
@@ -106,7 +106,6 @@ jobs:
 
       - name: Determine if Build is Needed and New uWolf App Version
         id: determine_build_info
-        shell: bash # Explicitly use bash for this crucial step
         run: |
           GITLAB_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}" 
           LAST_PROCESSED_LW_TAG="${{ steps.get_last_processed_lw_tag.outputs.last_processed_lw_tag }}" 
@@ -115,8 +114,8 @@ jobs:
           CURRENT_APP_VERSION_WITH_V="v$CURRENT_APP_VERSION_RAW" 
 
           NEW_UWOOLF_APP_VERSION_RAW="$CURRENT_APP_VERSION_RAW" # Proposed new version for manifest.json
-          SHOULD_BUILD=false
-          COMMIT_REQUIRED=false # Set to true if we increment manifest.json
+          SHOULD_BUILD="false"
+          COMMIT_REQUIRED="false" # Set to true if we increment manifest.json
 
           echo "Incoming LibreWolf Tag: $GITLAB_TAG"
           echo "Last Processed LibreWolf Tag: $LAST_PROCESSED_LW_TAG"
@@ -134,9 +133,9 @@ jobs:
           # Use a temporary variable for the comparison result to avoid pipe in 'if'
           COMPARE_LW_TAGS=$(printf "%s\n%s" "$GITLAB_TAG" "$LAST_PROCESSED_LW_TAG" | sort -V | tail -n 1)
           
-          NEWER_LIBREWOLF_AVAILABLE=false
+          NEWER_LIBREWOLF_AVAILABLE="false"
           if [ "$GITLAB_TAG" = "$COMPARE_LW_TAGS" ] && [ "$GITLAB_TAG" != "$LAST_PROCESSED_LW_TAG" ]; then
-            NEWER_LIBREWOLF_AVAILABLE=true
+            NEWER_LIBREWOLF_AVAILABLE="true"
             echo "Condition 1: Newer LibreWolf upstream version detected: $GITLAB_TAG"
           else
             echo "Condition 1: No newer LibreWolf upstream."
@@ -144,17 +143,17 @@ jobs:
           # --- FIX END ---
 
           # 2. Check if the current uWolf manifest.json version has been manually updated
-          UWOOLF_MANIFEST_VERSION_UPDATED=false
+          UWOOLF_MANIFEST_VERSION_UPDATED="false"
           if [ "$CURRENT_APP_VERSION_WITH_V" != "$LAST_RELEASED_APP_TAG" ]; then
-            UWOOLF_MANIFEST_VERSION_UPDATED=true
+            UWOOLF_MANIFEST_VERSION_UPDATED="true"
             echo "Condition 2: Current uWolf App Version in manifest.json ($CURRENT_APP_VERSION_WITH_V) differs from last released ($LAST_RELEASED_APP_TAG)."
           else
             echo "Condition 2: Current uWolf App Version is same as last released."
           fi
 
           # Decide if we need to build based on the correct logic
-          if [ "$NEWER_LIBREWOLF_AVAILABLE" = true ]; then
-            SHOULD_BUILD=true
+          if [ "$NEWER_LIBREWOLF_AVAILABLE" = "true" ]; then
+            SHOULD_BUILD="true"
             echo "Reason to build: Newer LibreWolf version is available ($GITLAB_TAG)."
             # If current app version matches the last *released* app tag, increment patch
             if [ "$CURRENT_APP_VERSION_WITH_V" = "$LAST_RELEASED_APP_TAG" ]; then
@@ -165,13 +164,13 @@ jobs:
               PATCH=${ADDR[2]}
               NEW_PATCH=$((PATCH + 1))
               NEW_UWOOLF_APP_VERSION_RAW="$MAJOR.$MINOR.$NEW_PATCH"
-              COMMIT_REQUIRED=true # Need to commit manifest.json change
+              COMMIT_REQUIRED="true" # Need to commit manifest.json change
               echo "  New proposed uWolf App Version (raw): $NEW_UWOOLF_APP_VERSION_RAW"
             else
               echo "  Current uWolf App Version ($CURRENT_APP_VERSION_WITH_V) is new. No patch increment needed."
             fi
-          elif [ "$UWOOLF_MANIFEST_VERSION_UPDATED" = true ]; then
-            SHOULD_BUILD=true
+          elif [ "$UWOOLF_MANIFEST_VERSION_UPDATED" = "true" ]; then
+            SHOULD_BUILD="true"
             echo "Reason to build: uWolf manifest.json version was manually updated ($CURRENT_APP_VERSION_WITH_V)."
             # No patch increment here, use the version from manifest.json as is.
           else
