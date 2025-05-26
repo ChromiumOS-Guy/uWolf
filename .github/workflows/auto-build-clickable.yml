@@ -257,19 +257,3 @@ jobs:
           files: build/*/app/*.click
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Secondary LibreWolf Tag
-        if: ${{ steps.determine_build_info.outputs.run_clickable == 'true' }}
-        run: |
-          set -eux
-          LIBREWOLF_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}"
-          
-          echo "Creating secondary Git tag for LibreWolf version: $LIBREWOLF_TAG"
-          if [ -n "$LIBREWOLF_TAG" ] && ! git rev-parse --verify "refs/tags/$LIBREWOLF_TAG" >/dev/null 2>&1; then
-            git tag "$LIBREWOLF_TAG"
-            git push origin "refs/tags/$LIBREWOLF_TAG"
-          else
-            echo "Git tag $LIBREWOLF_TAG already exists or is empty. Skipping creation."
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
