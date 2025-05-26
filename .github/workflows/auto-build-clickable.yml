@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest # Uses a GitHub-hosted runner with Ubuntu
     container: clickable/ci-20.04-arm64 # Specifies the Docker image for the job to run inside
 
-    # Permissions required for creating releases, pushing tags, AND pushing file changes
+    # Permissions required for creating releases and tags, AND pushing back to repo (if auto-increment is used)
     permissions:
       contents: write # Needed for softprops/action-gh-release AND for git push (if manifest is updated)
 
@@ -111,7 +111,8 @@ jobs:
         id: determine_release_info
         run: |
           # Enable strict error checking and command tracing for debugging
-          set -euxo pipefail
+          # Removed -o pipefail as it's not supported by this shell
+          set -eux
 
           GITLAB_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}"
           LAST_PROCESSED_LW_TAG="${{ steps.get_last_processed_lw_tag.outputs.last_processed_lw_tag }}"
@@ -162,7 +163,8 @@ jobs:
             # If current app version matches the last *released* app tag, increment patch
             if [ "$CURRENT_APP_VERSION_WITH_V" = "$LAST_RELEASED_APP_TAG" ]; then
               echo "  Current uWolf App Version ($CURRENT_APP_VERSION_WITH_V) is already used for a release. Incrementing patch."
-              IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_APP_VERSION_RAW"
+              # Changed <<< to | read
+              echo "$CURRENT_APP_VERSION_RAW" | IFS='.' read -r MAJOR MINOR PATCH
               NEW_PATCH=$((PATCH + 1))
               NEW_UWOOLF_APP_VERSION_RAW="$MAJOR.$MINOR.$NEW_PATCH"
               COMMIT_REQUIRED_FLAG=1 # Need to commit manifest.json change
@@ -190,7 +192,7 @@ jobs:
       - name: Update manifest.json and .last_librewolf_tag file (if required)
         if: ${{ steps.determine_build_info.outputs.commit_required == 'true' || steps.determine_build_info.outputs.run_clickable == 'true' }}
         run: |
-          set -euxo pipefail # For debugging this step too
+          set -eux # For debugging this step too
           NEW_UWOOLF_APP_VERSION_RAW="${{ steps.determine_build_info.outputs.new_uwolf_app_version_tag }}"
           NEW_UWOOLF_APP_VERSION_RAW="${NEW_UWOOLF_APP_VERSION_RAW#v}" # Remove 'v' prefix for manifest.json
           CURRENT_LW_TAG_FOR_THIS_BUILD="${{ steps.determine_build_info.outputs.current_lw_tag_for_this_build }}"
@@ -253,7 +255,7 @@ jobs:
       - name: Create Secondary LibreWolf Tag
         if: ${{ steps.determine_build_info.outputs.run_clickable == 'true' }}
         run: |
-          set -euxo pipefail # For debugging this step too
+          set -eux # For debugging this step too
           LIBREWOLF_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}"
           
           echo "Creating secondary Git tag for LibreWolf version: $LIBREWOLF_TAG"
