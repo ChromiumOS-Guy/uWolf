@@ -25,7 +25,6 @@ jobs:
           git config --global user.name "GitHub Actions"
 
       - name: Checkout repository and submodules
-        # Always checkout as we need to read manifest.json and potentially update files
         uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -108,30 +107,40 @@ jobs:
       - name: Determine if Build is Needed and New uWolf App Version
         id: determine_build_info
         run: |
-          GITLAB_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}" # v138.0.4-1
-          LAST_PROCESSED_LW_TAG="${{ steps.get_last_processed_lw_tag.outputs.last_processed_lw_tag }}" # v0.0.0 or last built LW version
-          LAST_RELEASED_APP_TAG="${{ steps.get_github_app_tag.outputs.github_app_tag }}" # v0.0.0 or v0.2.3
-          CURRENT_APP_VERSION_RAW="${{ steps.get_current_app_version.outputs.current_app_version }}" # 0.2.3
-          CURRENT_APP_VERSION_WITH_V="v$CURRENT_APP_VERSION_RAW" # v0.2.3
+          GITLAB_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}" # e.g., v138.0.4-1
+          LAST_PROCESSED_LW_TAG="${{ steps.get_last_processed_lw_tag.outputs.last_processed_lw_tag }}" # e.g., v0.0.0 or v138.0.4-1
+          LAST_RELEASED_APP_TAG="${{ steps.get_github_app_tag.outputs.github_app_tag }}" # e.g., v0.0.0 or v0.2.3
+          CURRENT_APP_VERSION_RAW="${{ steps.get_current_app_version.outputs.current_app_version }}" # e.g., 0.2.3
+          CURRENT_APP_VERSION_WITH_V="v$CURRENT_APP_VERSION_RAW" # e.g., v0.2.3
 
           NEW_UWOOLF_APP_VERSION_RAW="$CURRENT_APP_VERSION_RAW" # Proposed new version for manifest.json
           SHOULD_BUILD=false
-          COMMIT_REQUIRED=false # For manifest.json and .last_librewolf_tag
+          COMMIT_REQUIRED=false # Set to true if we increment manifest.json
 
           echo "Incoming LibreWolf Tag: $GITLAB_TAG"
           echo "Last Processed LibreWolf Tag: $LAST_PROCESSED_LW_TAG"
           echo "Current uWolf App Version (from manifest): $CURRENT_APP_VERSION_WITH_V"
           echo "Last Released uWolf App Tag (from GitHub releases): $LAST_RELEASED_APP_TAG"
 
+          # Ensure tags are not empty for comparison
+          if [ -z "$GITLAB_TAG" ]; then GITLAB_TAG="v0.0.0"; fi
+          if [ -z "$LAST_PROCESSED_LW_TAG" ]; then LAST_PROCESSED_LW_TAG="v0.0.0"; fi
+          if [ -z "$LAST_RELEASED_APP_TAG" ]; then LAST_RELEASED_APP_TAG="v0.0.0"; fi
+          if [ -z "$CURRENT_APP_VERSION_WITH_V" ]; then CURRENT_APP_VERSION_WITH_V="v0.0.0"; fi
+
+          # --- FIX START ---
           # 1. Check if a new LibreWolf version is available (compare against last processed)
-          HIGHEST_LW_TAG=$(printf "%s\n%s" "$GITLAB_TAG" "$LAST_PROCESSED_LW_TAG" | sort -V | tail -n 1)
+          # Use a temporary variable for the comparison result to avoid pipe in 'if'
+          COMPARE_LW_TAGS=$(printf "%s\n%s" "$GITLAB_TAG" "$LAST_PROCESSED_LW_TAG" | sort -V | tail -n 1)
+          
           NEWER_LIBREWOLF_AVAILABLE=false
-          if [ "$GITLAB_TAG" = "$HIGHEST_LW_TAG" ] && [ "$GITLAB_TAG" != "$LAST_PROCESSED_LW_TAG" ]; then
+          if [ "$GITLAB_TAG" = "$COMPARE_LW_TAGS" ] && [ "$GITLAB_TAG" != "$LAST_PROCESSED_LW_TAG" ]; then
             NEWER_LIBREWOLF_AVAILABLE=true
             echo "Condition 1: Newer LibreWolf upstream version detected: $GITLAB_TAG"
           else
             echo "Condition 1: No newer LibreWolf upstream."
           fi
+          # --- FIX END ---
 
           # 2. Check if the current uWolf manifest.json version has been manually updated
           UWOOLF_MANIFEST_VERSION_UPDATED=false
@@ -142,7 +151,7 @@ jobs:
             echo "Condition 2: Current uWolf App Version is same as last released."
           fi
 
-          # Decide if we need to build
+          # Decide if we need to build based on the correct logic
           if [ "$NEWER_LIBREWOLF_AVAILABLE" = true ]; then
             SHOULD_BUILD=true
             echo "Reason to build: Newer LibreWolf version is available ($GITLAB_TAG)."
@@ -198,9 +207,17 @@ jobs:
 
           # Only commit and push if there are changes to commit
           if git diff --cached --exit-code; then
-            echo "No changes to commit."
+            echo "No changes to commit (or nothing staged yet). Check if working directory is clean."
+            # Check if there are any changes in the working directory (unstaged or staged but not yet committed)
+            if ! git diff --exit-code && ! git diff --cached --exit-code; then
+              echo "Working directory is clean. No commit needed."
+            else
+              echo "Changes detected in working directory, but not staged. Committing now."
+              git commit -am "chore: Automated update for uWolf version to $NEW_UWOOLF_APP_VERSION_RAW (LibreWolf $CURRENT_LW_TAG_FOR_THIS_BUILD)"
+              git push origin HEAD:${{ github.ref_name }} # Push to the current branch
+            fi
           else
-            echo "Committing changes to manifest.json and/or .last_librewolf_tag"
+            echo "Changes staged. Committing now."
             git commit -m "chore: Automated update for uWolf version to $NEW_UWOOLF_APP_VERSION_RAW (LibreWolf $CURRENT_LW_TAG_FOR_THIS_BUILD)"
             git push origin HEAD:${{ github.ref_name }} # Push to the current branch
           fi
@@ -224,9 +241,7 @@ jobs:
         if: steps.determine_build_info.outputs.run_clickable == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          # Primary release tag is your uWolf version (e.g., v0.2.3, or v0.2.4 if incremented)
           tag_name: ${{ steps.determine_build_info.outputs.new_uwolf_app_version_tag }}
-          # Release name includes your uWolf version
           name: Alpha uWolf ${{ steps.determine_build_info.outputs.new_uwolf_app_version_tag }}
           body: |
             Automated **Alpha Release** for uWolf version `${{ steps.determine_build_info.outputs.new_uwolf_app_version_tag }}`.
@@ -237,22 +252,17 @@ jobs:
             *Built by GitHub Actions*
           prerelease: true
           draft: false
-          files: build/*/app/*.click # Attaches the generated .click files as release assets
+          files: build/*/app/*.click
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Secondary LibreWolf Tag
-        # This creates an *additional* Git tag pointing to the same commit as the primary release tag.
-        # It won't directly show in GitHub Releases UI as a separate release, but it will be a searchable tag.
         if: steps.determine_build_info.outputs.run_clickable == 'true'
         run: |
           LIBREWOLF_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}"
-          NEW_UWOOLF_APP_VERSION_TAG="${{ steps.determine_build_info.outputs.new_uwolf_app_version_tag }}"
-
+          
           echo "Creating secondary Git tag for LibreWolf version: $LIBREWOLF_TAG"
-          # Ensure the tag doesn't already exist to avoid errors on retry
           if ! git rev-parse --verify "refs/tags/$LIBREWOLF_TAG" >/dev/null 2>&1; then
-            # Create a lightweight tag. Annotated tags require more info.
             git tag "$LIBREWOLF_TAG"
             git push origin "refs/tags/$LIBREWOLF_TAG"
           else
