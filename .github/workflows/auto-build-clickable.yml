@@ -75,45 +75,38 @@ jobs:
           fi
           echo "last_processed_lw_tag=$LAST_PROCESSED_LW_TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Get latest uWolf App Tag from GitHub (using grep and sed)
+      - name: Get latest uWolf App Tag from GitHub (simplified grep/sed)
         id: get_github_app_tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Enable pipefail to ensure that if any command in a pipeline fails, the whole pipeline fails.
-          set -o pipefail
-
           GITHUB_API_URL="https://api.github.com/repos/ChromiumOS-Guy/uWolf/releases/latest"
           echo "Fetching latest uWolf app release tag from: $GITHUB_API_URL"
 
-          # Use curl to get the JSON, grep to find the tag_name line,
-          # and sed to extract just the version number.
-          # Redirect stderr of curl to /dev/null to prevent non-JSON output.
-          # Use a temporary file to capture the curl output before piping to grep,
-          # which can be more robust if curl outputs initial non-JSON data.
-          raw_response_file=$(mktemp)
-          if ! curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_API_URL" 2>/dev/null > "$raw_response_file"; then
-            echo "Error: curl command failed."
-            LATEST_GITHUB_APP_TAG="v0.0.0"
-          else
-            # Check if the raw response contains the "Not Found" message from GitHub API
-            if grep -q '"message": "Not Found"' "$raw_response_file"; then
-              echo "No existing GitHub releases found in this repository or API returned 'Not Found'."
-              LATEST_GITHUB_APP_TAG="v0.0.0" # Baseline for comparison
-            else
-              # Extract the tag_name using grep and sed
-              # This will output just the version string, e.g., "v0.2.3"
-              LATEST_GITHUB_APP_TAG=$(cat "$raw_response_file" | grep '"tag_name":' | sed -n 's/.*"tag_name": "\(.*\)".*/\1/p')
+          # Capture the full curl response. Redirect stderr to /dev/null to avoid extraneous messages.
+          # The -s (silent) option already suppresses progress meter and error messages.
+          FULL_CURL_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_API_URL" 2>/dev/null)
 
-              if [ -z "$LATEST_GITHUB_APP_TAG" ]; then
-                echo "Error: Could not extract tag_name using grep/sed. Assuming v0.0.0"
-                echo "Full raw response for debugging:"
-                cat "$raw_response_file" # Print the raw response for debugging
-                LATEST_GITHUB_APP_TAG="v0.0.0" # Fallback
-              fi
+          LATEST_GITHUB_APP_TAG="v0.0.0" # Baseline for comparison
+
+          # Check if the full response contains the "Not Found" message from GitHub API
+          # Use grep -q (quiet) to just check for existence without printing.
+          if echo "$FULL_CURL_RESPONSE" | grep -q '"message": "Not Found"'; then
+            echo "No existing GitHub releases found in this repository or API returned 'Not Found'."
+            # LATEST_GITHUB_APP_TAG remains v0.0.0
+          else
+            # If "Not Found" is not present, proceed to extract the tag_name
+            # Use the pipeline: echo (full response) | grep | sed
+            extracted_tag=$(echo "$FULL_CURL_RESPONSE" | grep '"tag_name":' | sed -n 's/.*"tag_name": "\(.*\)".*/\1/p')
+
+            if [ -z "$extracted_tag" ]; then
+              echo "Error: Could not extract tag_name using grep/sed. Assuming v0.0.0"
+              echo "Full Response for debugging:"
+              echo "$FULL_CURL_RESPONSE" # Print the full response if extraction fails
+              # LATEST_GITHUB_APP_TAG remains v0.0.0
+            else
+              LATEST_GITHUB_APP_TAG="$extracted_tag"
             fi
-            # Clean up the temporary file
-            rm "$raw_response_file"
           fi
 
           echo "Latest GitHub uWolf App Tag: $LATEST_GITHUB_APP_TAG"
