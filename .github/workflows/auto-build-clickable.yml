@@ -25,7 +25,7 @@ jobs:
         id: get_gitlab_tag
         run: |
           # Project ID for librewolf-community/browser/appimage
-          GITLAB_PROJECT_ID="38692737"
+          GITLAB_PROJECT_ID="24386000"
           GITLAB_API_URL="https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/releases/permalink/latest"
 
           echo "Fetching latest GitLab release from: $GITLAB_API_URL"
