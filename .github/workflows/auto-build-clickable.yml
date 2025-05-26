@@ -133,11 +133,11 @@ jobs:
       - name: Determine New Release Version and Build Trigger
         id: determine_build_info
         run: |
-          set -eux 
+          set -eux # Keep this for debugging and strictness
 
           GITLAB_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}"
           LAST_PROCESSED_LW_TAG="${{ steps.get_last_processed_lw_tag.outputs.last_processed_lw_tag }}"
-          LAST_RELEASED_APP_TAG="${{ steps.get_github_app_tag.outputs.latest_github_app_tag }}"
+          LAST_RELEASED_APP_TAG="${{ steps.get_github_app_tag.outputs.github_app_tag }}"
           CURRENT_APP_VERSION_RAW="${{ steps.get_current_app_version.outputs.current_app_version }}"
           CURRENT_APP_VERSION_WITH_V="v$CURRENT_APP_VERSION_RAW"
 
@@ -178,7 +178,12 @@ jobs:
             if [ "$CURRENT_APP_VERSION_WITH_V" = "$LAST_RELEASED_APP_TAG" ]; then
               echo "  Current uWolf App Version ($CURRENT_APP_VERSION_WITH_V) is already used for a release."
               echo "  Incrementing patch for a new build based on LibreWolf update."
-              echo "$CURRENT_APP_VERSION_RAW" | IFS='.' read -r MAJOR MINOR PATCH
+
+              # Fix: Parse version using cut to avoid subshell issues with 'read'
+              MAJOR=$(echo "$CURRENT_APP_VERSION_RAW" | cut -d'.' -f1)
+              MINOR=$(echo "$CURRENT_APP_VERSION_RAW" | cut -d'.' -f2)
+              PATCH=$(echo "$CURRENT_APP_VERSION_RAW" | cut -d'.' -f3)
+
               NEW_PATCH=$((PATCH + 1))
               NEW_UWOOLF_APP_VERSION_RAW="$MAJOR.$MINOR.$NEW_PATCH"
               COMMIT_REQUIRED_FLAG=1
