@@ -75,23 +75,39 @@ jobs:
           fi
           echo "last_processed_lw_tag=$LAST_PROCESSED_LW_TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Get Latest uWolf App Tag from GitHub Releases
+      - name: Get Latest uWolf App Tag from GitHub Releases (including pre-releases)
         id: get_github_app_tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -eux
-          GITHUB_API_URL="https://api.github.com/repos/${{ github.repository }}/releases/latest"
-          echo "Fetching latest uWolf app release tag from: $GITHUB_API_URL"
-          GITHUB_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_API_URL")
+          GITHUB_API_URL="https://api.github.com/repos/${{ github.repository }}/releases" # Fetch all releases
+          echo "Fetching all uWolf app release tags from: $GITHUB_API_URL"
+
+          # Fetch all releases. We'll rely on `jq` to sort and find the highest version.
+          # We need to loop through pages if there are many releases, but for most repos,
+          # the first page (default 30 per page) should be enough, or use `per_page=100`.
+          # Using `per_page=100` to get more at once.
+          GITHUB_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_API_URL?per_page=100")
 
           LATEST_GITHUB_APP_TAG="v0.0.0" # Default baseline
 
-          if echo "$GITHUB_RESPONSE" | jq -e 'has("message") and .message == "Not Found"' >/dev/null; then
-            echo "No existing GitHub releases found in this repository."
+          # Check if the response indicates "Not Found" or is empty, meaning no releases
+          if echo "$GITHUB_RESPONSE" | jq -e 'has("message") and .message == "Not Found"' >/dev/null || [ -z "$(echo "$GITHUB_RESPONSE" | jq -r '.[]')" ]; then
+            echo "No existing GitHub releases found in this repository or API error."
           else
-            LATEST_GITHUB_APP_TAG=$(echo "$GITHUB_RESPONSE" | jq -r '.tag_name // empty')
-            if [ -z "$LATEST_GITHUB_APP_TAG" ]; then LATEST_GITHUB_APP_TAG="v0.0.0"; fi
+            # Extract all tag_names and sort them using 'sort -V' for version comparison.
+            # `jq -r '.[].tag_name'` extracts all tag names.
+            # `grep '^v'` ensures we only consider tags starting with 'v'.
+            # `sort -V` performs a version-aware sort.
+            # `tail -n 1` gets the very last (highest) version.
+            # Handle potential empty output from grep/sort if no 'v' tags exist
+            LATEST_GITHUB_APP_TAG=$(echo "$GITHUB_RESPONSE" | jq -r '.[].tag_name // empty' | grep '^v' | sort -V | tail -n 1)
+            
+            if [ -z "$LATEST_GITHUB_APP_TAG" ]; then
+              echo "Could not determine latest GitHub App Tag from releases. Defaulting to v0.0.0."
+              LATEST_GITHUB_APP_TAG="v0.0.0"
+            fi
           fi
           echo "Latest GitHub uWolf App Release Tag: $LATEST_GITHUB_APP_TAG"
           echo "github_app_tag=$LATEST_GITHUB_APP_TAG" >> "$GITHUB_OUTPUT"
