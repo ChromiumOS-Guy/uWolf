@@ -82,17 +82,32 @@ jobs:
         run: |
           GITHUB_API_URL="https://api.github.com/repos/ChromiumOS-Guy/uWolf/releases/latest"
           echo "Fetching latest uWolf app release tag from: $GITHUB_API_URL"
-          GITHUB_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_API_URL")
+
+          # Ensure only JSON output is captured by redirecting stderr to /dev/null
+          GITHUB_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_API_URL" 2>/dev/null)
+
           LATEST_GITHUB_APP_TAG=""
+
+          # Check if the response contains an error message or is empty
           if echo "$GITHUB_RESPONSE" | jq -e 'has("message") and .message == "Not Found"' >/dev/null; then
-            echo "No existing GitHub releases found in this repository."
+            echo "No existing GitHub releases found in this repository or API returned 'Not Found'."
             LATEST_GITHUB_APP_TAG="v0.0.0" # Baseline for comparison
           else
-            LATEST_GITHUB_APP_TAG=$(echo "$GITHUB_RESPONSE" | jq -r '.tag_name // empty')
-            if [ -z "$LATEST_GITHUB_APP_TAG" ]; then
-              echo "Error: Could not extract tag_name from GitHub API response. Assuming v0.0.0"
-              echo "Response: $GITHUB_RESPONSE"
-              LATEST_GITHUB_APP_TAG="v0.0.0" # Fallback
+            # Attempt to extract tag_name. If GITHUB_RESPONSE is truly empty or not JSON, this might still fail.
+            # Adding a check for non-empty response before jq.
+            if [ -z "$GITHUB_RESPONSE" ]; then
+              echo "Error: GitHub API response was empty. Assuming v0.0.0"
+              LATEST_GITHUB_APP_TAG="v0.0.0"
+            else
+              # Safely try to parse JSON and extract tag_name
+              # The 'try' block in jq is more robust for potentially malformed input
+              LATEST_GITHUB_APP_TAG=$(echo "$GITHUB_RESPONSE" | jq -r 'try .tag_name // empty' 2>/dev/null)
+              
+              if [ -z "$LATEST_GITHUB_APP_TAG" ]; then
+                echo "Error: Could not extract tag_name from GitHub API response. Assuming v0.0.0"
+                echo "Full Response for debugging: $GITHUB_RESPONSE" # Output full response if extraction fails
+                LATEST_GITHUB_APP_TAG="v0.0.0" # Fallback
+              fi
             fi
           fi
           echo "Latest GitHub uWolf App Tag: $LATEST_GITHUB_APP_TAG"
