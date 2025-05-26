@@ -81,32 +81,48 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -eux
-          GITHUB_API_URL="https://api.github.com/repos/${{ github.repository }}/releases" # Fetch all releases
-          echo "Fetching all uWolf app release tags from: $GITHUB_API_URL"
 
-          # Fetch all releases. Storing the output directly in GITHUB_RESPONSE
-          # using `curl -s` to suppress extraneous output.
-          GITHUB_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_API_URL?per_page=100")
+          REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+          GITHUB_API_URL="https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases"
+
+          echo "Attempting to fetch ALL uWolf app releases from: $GITHUB_API_URL"
+
+          # Fetch all releases. Ensure no extra output.
+          # Use `printf %s` to ensure the variable doesn't have extra newlines when passed to jq.
+          ALL_RELEASES_JSON=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_API_URL?per_page=100")
 
           LATEST_GITHUB_APP_TAG="v0.0.0" # Default baseline
 
-          # Check if the response indicates "Not Found" or is an empty array/invalid JSON
-          # We check if it's not a valid JSON array or if it's an empty array.
-          if echo "$GITHUB_RESPONSE" | jq -e '.[0].tag_name' >/dev/null 2>&1; then # Check if it's a non-empty array with tag_name
-            # Extract all tag_names and sort them using 'sort -V' for version comparison.
-            LATEST_GITHUB_APP_TAG=$(echo "$GITHUB_RESPONSE" | jq -r '.[].tag_name // empty' | grep '^v' | sort -V | tail -n 1)
+          # Check if the response is empty or contains an error message.
+          # It's crucial to check if the JSON is an array of releases, not an error object.
+          if echo "$ALL_RELEASES_JSON" | jq -e 'type == "array" and length > 0' >/dev/null; then
+            echo "Successfully fetched GitHub releases. Parsing for latest tag..."
+            
+            # Extract all tag_names, filter for 'v' prefixed tags, sort version-wise, and get the last (highest).
+            LATEST_GITHUB_APP_TAG=$(
+              echo "$ALL_RELEASES_JSON" | \
+              jq -r '.[].tag_name // empty' | \
+              grep '^v' | \
+              sort -V | \
+              tail -n 1
+            )
             
             if [ -z "$LATEST_GITHUB_APP_TAG" ]; then
-              echo "Could not determine latest GitHub App Tag from valid releases. Defaulting to v0.0.0."
+              echo "No 'v' prefixed tags found in GitHub releases. Defaulting to v0.0.0."
               LATEST_GITHUB_APP_TAG="v0.0.0"
             fi
+          elif echo "$ALL_RELEASES_JSON" | jq -e 'has("message")' >/dev/null; then
+            echo "GitHub API returned an error message (e.g., Not Found, or Rate Limit Exceeded):"
+            echo "$ALL_RELEASES_JSON" # Print error message for debugging
+            echo "Defaulting to v0.0.0."
           else
-            echo "No existing GitHub releases found or API returned an unexpected response. Defaulting to v0.0.0."
+            echo "No GitHub releases found or unexpected empty response. Defaulting to v0.0.0."
           fi
 
           echo "Latest GitHub uWolf App Release Tag: $LATEST_GITHUB_APP_TAG"
           echo "github_app_tag=$LATEST_GITHUB_APP_TAG" >> "$GITHUB_OUTPUT"
-          
+
       - name: Get Current uWolf App Version from manifest.json
         id: get_current_app_version
         run: |
