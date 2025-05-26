@@ -7,12 +7,11 @@ on:
 
 jobs:
   check-and-release:
-    runs-on: ubuntu-latest # Uses a GitHub-hosted runner with Ubuntu
-    container: clickable/ci-20.04-arm64 # Specifies the Docker image for the job to run inside
+    runs-on: ubuntu-latest
+    container: clickable/ci-20.04-arm64
 
-    # Permissions required for creating releases and tags, AND pushing back to repo
     permissions:
-      contents: write # Needed for softprops/action-gh-release AND for git push
+      contents: write
 
     steps:
       - name: Install Utilities (jq, curl, git)
@@ -21,18 +20,20 @@ jobs:
           apt-get install -y jq curl git
 
       - name: Configure Git for Auto-Commit
-        # This is necessary if we're going to push changes back to the repo
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
 
-      - name: Get latest GitLab release tag (Following Redirects)
-        id: get_gitlab_tag
+      - name: Get latest LibreWolf tag from GitLab (Following Redirects)
+        id: get_gitlab_tag # Renamed step for clarity
         run: |
           GITLAB_PROJECT_ID="24386000"
           GITLAB_PERMALINK_URL="https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/releases/permalink/latest"
-          echo "Attempting to fetch latest GitLab release tag via permalink: $GITLAB_PERMALINK_URL"
+
+          echo "Attempting to fetch latest LibreWolf tag via permalink: $GITLAB_PERMALINK_URL"
+
           EFFECTIVE_URL=$(curl -s -L -o /dev/null -w '%{url_effective}' "$GITLAB_PERMALINK_URL")
+
           echo "Effective (redirected) URL: $EFFECTIVE_URL"
 
           if [ -z "$EFFECTIVE_URL" ]; then
@@ -40,40 +41,41 @@ jobs:
             echo "gitlab_tag=v0.0.0" >> $GITHUB_OUTPUT
             exit 0
           fi
+
           GITLAB_TAG=$(basename "$EFFECTIVE_URL")
+
           if [ -z "$GITLAB_TAG" ]; then
             echo "Error: Could not extract tag from the effective URL: $EFFECTIVE_URL"
             echo "gitlab_tag=v0.0.0" >> $GITHUB_OUTPUT
           else
-            echo "Latest GitLab Tag (LibreWolf version): $GITLAB_TAG"
+            echo "Latest LibreWolf Tag: $GITLAB_TAG" # Renamed output
             echo "gitlab_tag=$GITLAB_TAG" >> $GITHUB_OUTPUT
           fi
 
-      - name: Get latest GitHub release information
-        id: get_github_release_info
+      - name: Get latest uWolf Release Information from GitHub
+        id: get_github_release_info # Renamed step for clarity
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           GITHUB_API_URL="https://api.github.com/repos/${{ github.repository }}/releases/latest"
-          echo "Fetching latest GitHub release info from: $GITHUB_API_URL"
+          echo "Fetching latest uWolf release info from: $GITHUB_API_URL" # Renamed output
           GITHUB_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_API_URL")
 
           LAST_RELEASE_APP_TAG=""
-          LAST_RELEASE_LIBREWOLF_TAG=""
+          LAST_RELEASE_LIBREWOLF_TAG="" # This variable now truly holds the last *processed LibreWolf* tag
 
           if echo "$GITHUB_RESPONSE" | jq -e 'has("message") and .message == "Not Found"' >/dev/null; then
             echo "No existing GitHub releases found in this repository."
             LAST_RELEASE_APP_TAG="v0.0.0" # Baseline for app version
             LAST_RELEASE_LIBREWOLF_TAG="v0.0.0" # Baseline for LibreWolf version
           else
-            # Extract app tag from `tag_name`
             LAST_RELEASE_APP_TAG=$(echo "$GITHUB_RESPONSE" | jq -r '.tag_name // empty')
             if [ -z "$LAST_RELEASE_APP_TAG" ]; then LAST_RELEASE_APP_TAG="v0.0.0"; fi
 
-            # Attempt to extract LibreWolf version from the release body
-            # We'll look for a specific line like "This build is based on **LibreWolf version**: `v138.0.4-1`."
             RELEASE_BODY=$(echo "$GITHUB_RESPONSE" | jq -r '.body // empty')
-            EXTRACTED_LIBREWOLF_TAG=$(echo "$RELEASE_BODY" | grep -oP 'This build is based on \*\*LibreWolf version\*\*:\s*`\K[^`]+' || true) # Use || true to prevent script failure if grep finds nothing
+            # Adjusting regex to correctly capture the LibreWolf version from release notes
+            # It expects "This build is based on **LibreWolf version**: `vX.Y.Z-R`."
+            EXTRACTED_LIBREWOLF_TAG=$(echo "$RELEASE_BODY" | grep -oP 'This build is based on \*\*LibreWolf version\*\*:\s*`\K[^`]+' || true)
 
             if [ -z "$EXTRACTED_LIBREWOLF_TAG" ]; then
                 echo "Warning: Could not extract LibreWolf tag from the previous release body. Assuming v0.0.0 for comparison."
@@ -83,23 +85,20 @@ jobs:
             fi
           fi
 
-          echo "Last Released App Tag (our app version): $LAST_RELEASE_APP_TAG"
+          echo "Last Released uWolf App Tag: $LAST_RELEASE_APP_TAG" # Renamed output
           echo "Last Released LibreWolf Tag (from previous release notes): $LAST_RELEASE_LIBREWOLF_TAG"
           echo "last_release_app_tag=$LAST_RELEASE_APP_TAG" >> $GITHUB_OUTPUT
           echo "last_release_librewolf_tag=$LAST_RELEASE_LIBREWOLF_TAG" >> $GITHUB_OUTPUT
 
 
       - name: Checkout repository and submodules
-        # We need to checkout unconditionally because we might modify manifest.json
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          # Token for pushing back if manifest.json is updated.
-          # For public repos, GITHUB_TOKEN might be enough. For private, a PAT might be needed.
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get Current App Version from manifest.json
-        id: get_current_app_version
+      - name: Get Current uWolf App Version from manifest.json
+        id: get_current_app_version # Renamed step for clarity
         run: |
           if [ -f manifest.json ]; then
             CURRENT_APP_VERSION=$(jq -r '.version' manifest.json)
@@ -107,81 +106,106 @@ jobs:
               echo "Warning: Could not extract version from manifest.json. Defaulting to 0.0.0."
               CURRENT_APP_VERSION="0.0.0"
             fi
-            echo "Current App Version from manifest.json: $CURRENT_APP_VERSION"
+            echo "Current uWolf App Version from manifest.json: $CURRENT_APP_VERSION" # Renamed output
           else
             echo "Error: manifest.json not found in repository root. Defaulting to 0.0.0."
             CURRENT_APP_VERSION="0.0.0"
           fi
           echo "current_app_version=$CURRENT_APP_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Determine New App Version if needed
-        id: determine_new_app_version
+      - name: Determine New uWolf App Version if needed
+        id: determine_new_app_version # Renamed step for clarity
         run: |
           GITLAB_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}"
           LAST_RELEASE_LIBREWOLF_TAG="${{ steps.get_github_release_info.outputs.last_release_librewolf_tag }}"
           LAST_RELEASE_APP_TAG="${{ steps.get_github_release_info.outputs.last_release_app_tag }}"
-          CURRENT_APP_VERSION="${{ steps.get_current_app_version.outputs.current_app_version }}"
+          CURRENT_APP_VERSION_RAW="${{ steps.get_current_app_version.outputs.current_app_version }}"
+          CURRENT_APP_VERSION="v$CURRENT_APP_VERSION_RAW" # Add 'v' prefix for comparison
 
-          NEW_APP_VERSION="$CURRENT_APP_VERSION" # Start with current
+          NEW_APP_VERSION_RAW="$CURRENT_APP_VERSION_RAW" # Start with current raw version
           SHOULD_BUILD=false
           COMMIT_REQUIRED=false
 
-          echo "GitLab Tag (upstream): $GITLAB_TAG"
-          echo "Last Released LibreWolf Tag: $LAST_RELEASE_LIBREWOLF_TAG"
-          echo "Current App Version (from manifest): $CURRENT_APP_VERSION"
-          echo "Last Released App Tag: $LAST_RELEASE_APP_TAG"
+          echo "Incoming LibreWolf Tag (upstream): $GITLAB_TAG"
+          echo "Last Released LibreWolf Tag (from uWolf release notes): $LAST_RELEASE_LIBREWOLF_TAG"
+          echo "Current uWolf App Version (from manifest): $CURRENT_APP_VERSION"
+          echo "Last Released uWolf App Tag: $LAST_RELEASE_APP_TAG"
 
-          # Use sort -V for robust semantic version comparison
-          # Compare current GitLab_TAG with LAST_RELEASE_LIBREWOLF_TAG
-          # If GITLAB_TAG is higher, it means a new upstream version is available
+          # Ensure all tags are properly formatted for sort -V comparison
+          # GITHUB_TAG here refers to the last released *app* version tag
+          if [ -z "$GITLAB_TAG" ]; then GITLAB_TAG="v0.0.0"; fi
+          if [ -z "$LAST_RELEASE_LIBREWOLF_TAG" ]; then LAST_RELEASE_LIBREWOLF_TAG="v0.0.0"; fi
+          if [ -z "$CURRENT_APP_VERSION" ]; then CURRENT_APP_VERSION="v0.0.0"; fi
+          if [ -z "$LAST_RELEASE_APP_TAG" ]; then LAST_RELEASE_APP_TAG="v0.0.0"; fi
+
+          # Check if a newer LibreWolf version is available based on our historical record
           HIGHEST_LIBREWOLF_TAG_COMPARE=$(printf "%s\n%s" "$GITLAB_TAG" "$LAST_RELEASE_LIBREWOLF_TAG" | sort -V | tail -n 1)
-
+          NEWER_LIBREWOLF_UPSTREAM_AVAILABLE=false
           if [ "$GITLAB_TAG" = "$HIGHEST_LIBREWOLF_TAG_COMPARE" ] && [ "$GITLAB_TAG" != "$LAST_RELEASE_LIBREWOLF_TAG" ]; then
-            echo "Action: Newer LibreWolf version detected ($GITLAB_TAG)."
-            # A new LibreWolf version is available.
-            # We must build. If our current app version is already released, we need to increment.
-            if [ "v$CURRENT_APP_VERSION" = "$LAST_RELEASE_APP_TAG" ]; then
-              echo "  Current app version $CURRENT_APP_VERSION already released. Incrementing patch."
-              IFS='.' read -ra ADDR <<< "$CURRENT_APP_VERSION"
+            NEWER_LIBREWOLF_UPSTREAM_AVAILABLE=true
+            echo "Condition: Newer LibreWolf upstream version detected: $GITLAB_TAG"
+          else
+            echo "Condition: No newer LibreWolf upstream version ($GITLAB_TAG) compared to last processed ($LAST_RELEASE_LIBREWOLF_TAG)."
+          fi
+
+          # Check if the current app version in manifest.json is different from the last *released* app version
+          APP_VERSION_DIFFERS_FROM_LAST_RELEASED=false
+          if [ "$CURRENT_APP_VERSION" != "$LAST_RELEASE_APP_TAG" ]; then
+            APP_VERSION_DIFFERS_FROM_LAST_RELEASED=true
+            echo "Condition: Current uWolf App Version ($CURRENT_APP_VERSION) differs from last released ($LAST_RELEASE_APP_TAG)."
+          else
+            echo "Condition: Current uWolf App Version is same as last released ($CURRENT_APP_VERSION)."
+          fi
+
+          if [ "$NEWER_LIBREWOLF_UPSTREAM_AVAILABLE" = true ]; then
+            SHOULD_BUILD=true
+            echo "Reason to build: Newer LibreWolf upstream version available."
+            # If current app version is identical to the last released app version,
+            # we need to increment its patch to create a unique release.
+            if [ "$CURRENT_APP_VERSION" = "$LAST_RELEASE_APP_TAG" ]; then
+              echo "  Current uWolf App Version is already released. Incrementing patch version."
+              IFS='.' read -ra ADDR <<< "$CURRENT_APP_VERSION_RAW"
               MAJOR=${ADDR[0]}
               MINOR=${ADDR[1]}
               PATCH=${ADDR[2]}
               NEW_PATCH=$((PATCH + 1))
-              NEW_APP_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+              NEW_APP_VERSION_RAW="$MAJOR.$MINOR.$NEW_PATCH"
               COMMIT_REQUIRED=true
-            else
-              echo "  Current app version $CURRENT_APP_VERSION is not yet released as $LAST_RELEASE_APP_TAG. No increment needed."
+              echo "  New proposed uWolf App Version: $NEW_APP_VERSION_RAW"
             fi
+          elif [ "$APP_VERSION_DIFFERS_FROM_LAST_RELEASED" = true ]; then
             SHOULD_BUILD=true
-          elif [ "v$CURRENT_APP_VERSION" != "$LAST_RELEASE_APP_TAG" ]; then
-            echo "Action: App version in manifest.json has been manually updated ($CURRENT_APP_VERSION != $LAST_RELEASE_APP_TAG). Building."
-            # Our app version was manually updated, so we should build/release that.
-            SHOULD_BUILD=true
+            echo "Reason to build: Current uWolf App Version in manifest.json is new/different."
+            # No increment needed here, as manifest.json was manually updated.
           else
-            echo "Action: No new LibreWolf version and current app version is already released. Skipping build."
+            echo "No reason to build: No new LibreWolf upstream, and current uWolf App Version is already released."
           fi
 
-          echo "Should Build: $SHOULD_BUILD"
-          echo "New App Version: $NEW_APP_VERSION"
-          echo "Commit Required: $COMMIT_REQUIRED"
+          echo "Final Decision - Should Build: $SHOULD_BUILD"
+          echo "Final Proposed App Version (raw): $NEW_APP_VERSION_RAW"
+          echo "Commit manifest.json Required: $COMMIT_REQUIRED"
 
           echo "run_clickable=$SHOULD_BUILD" >> $GITHUB_OUTPUT
-          echo "new_app_version_tag=v$NEW_APP_VERSION" >> $GITHUB_OUTPUT
+          echo "new_app_version_tag=v$NEW_APP_VERSION_RAW" >> $GITHUB_OUTPUT # Tag will always have 'v' prefix
           echo "commit_required=$COMMIT_REQUIRED" >> $GITHUB_OUTPUT
 
-      - name: Update manifest.json if patch incremented
+
+      - name: Update manifest.json if patch incremented and Push Changes
         if: steps.determine_new_app_version.outputs.commit_required == 'true'
         run: |
           NEW_APP_VERSION_RAW="${{ steps.determine_new_app_version.outputs.new_app_version_tag }}"
-          # Remove 'v' prefix
-          NEW_APP_VERSION_RAW="${NEW_APP_VERSION_RAW#v}" 
-          
+          NEW_APP_VERSION_RAW="${NEW_APP_VERSION_RAW#v}" # Remove 'v' prefix for manifest.json
+
           echo "Updating manifest.json to version $NEW_APP_VERSION_RAW"
           jq ".version = \"$NEW_APP_VERSION_RAW\"" manifest.json > manifest.json.tmp && mv manifest.json.tmp manifest.json
-          
+
           git add manifest.json
-          git commit -m "chore: Auto-increment patch version to $NEW_APP_VERSION_RAW for new LibreWolf base"
+          git commit -m "chore: Auto-increment uWolf patch version to $NEW_APP_VERSION_RAW for new LibreWolf base"
           git push origin HEAD:${{ github.ref_name }} # Push to the current branch
+        env:
+          # Ensure this step has access to the GITHUB_TOKEN for pushing
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Build Click package for arm64
         if: steps.determine_new_app_version.outputs.run_clickable == 'true'
