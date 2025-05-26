@@ -8,7 +8,7 @@ on:
 jobs:
   check-and-release:
     runs-on: ubuntu-latest # Uses a GitHub-hosted runner with Ubuntu
-    container: clickable/ci-20.04-amd64 # Specifies the Docker image for the job to run inside
+    container: clickable/ci-20.04-arm64 # Specifies the Docker image for the job to run inside
 
     # Permissions required for creating releases and tags in your repository
     permissions:
