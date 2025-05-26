@@ -75,30 +75,56 @@ jobs:
           fi
           echo "last_processed_lw_tag=$LAST_PROCESSED_LW_TAG" >> "$GITHUB_OUTPUT"
 
-      
+      - name: Get latest uWolf App Tag from GitHub (including pre-releases)
+        id: get_github_app_tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          GITHUB_API_URL="https://api.github.com/repos/${{ github.repository }}/releases?per_page=100" # Fetch multiple releases
+          echo "Fetching uWolf app releases from: $GITHUB_API_URL"
+          GITHUB_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_API_URL")
+          LATEST_GITHUB_APP_TAG="v0.0.0" # Baseline for comparison
+
+          if echo "$GITHUB_RESPONSE" | jq -e '.[0] | has("message") and .message == "Not Found"' >/dev/null; then
+            echo "No existing GitHub releases found in this repository."
+            # LATEST_GITHUB_APP_TAG remains v0.0.0
+          elif echo "$GITHUB_RESPONSE" | jq -e 'length == 0' >/dev/null; then
+            echo "No releases found in the repository. Assuming v0.0.0"
+            # LATEST_GITHUB_APP_TAG remains v0.0.0
+          else
+            # Filter for both stable and pre-releases, and sort by version (assuming semantic versioning)
+            # This jq command assumes a semantic versioning format (e.g., v1.2.3, v1.2.3-alpha.1)
+            # It extracts all tag_names, sorts them semver-aware, and takes the last one (highest version).
+            LATEST_GITHUB_APP_TAG=$(echo "$GITHUB_RESPONSE" | jq -r '
+              .[] | select(.tag_name != null and .tag_name != "") | .tag_name
+            ' | sort -V | tail -n 1)
+
+            if [ -z "$LATEST_GITHUB_APP_TAG" ]; then
+              echo "Error: Could not extract a valid tag_name from GitHub API response. Assuming v0.0.0"
+              echo "Response: $GITHUB_RESPONSE"
+              LATEST_GITHUB_APP_TAG="v0.0.0" # Fallback
+            fi
+          fi
+          echo "Latest GitHub uWolf App Tag (including pre-releases): $LATEST_GITHUB_APP_TAG"
+          echo "github_app_tag=$LATEST_GITHUB_APP_TAG" >> $GITHUB_OUTPUT # Renamed output for clarity
 
       - name: Get Current uWolf App Version from manifest.json
         id: get_current_app_version
         run: |
+          set -eux
+          CURRENT_APP_VERSION="0.0.0" # Default baseline
           if [ -f manifest.json ]; then
             CURRENT_APP_VERSION=$(jq -r '.version' manifest.json)
-            if [ -z "$CURRENT_APP_VERSION" ] || [ "$CURRENT_APP_VERSION" == "null" ]; then
+            if [ -z "$CURRENT_APP_VERSION" ] || [ "$CURRENT_APP_VERSION" = "null" ]; then
               echo "Warning: Could not extract version from manifest.json. Defaulting to 0.0.0."
               CURRENT_APP_VERSION="0.0.0"
             fi
-            
-            # Check for pre-release versions (e.g., 1.0.0-alpha, 1.0.0-beta.1)
-            if [[ "$CURRENT_APP_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9\.-]+)?$ ]]; then
-              echo "Current uWolf App Version from manifest.json: $CURRENT_APP_VERSION (includes pre-release if applicable)"
-            else
-              echo "Warning: Version format in manifest.json does not seem to follow semver (e.g., 1.0.0 or 1.0.0-beta). Using extracted version: $CURRENT_APP_VERSION"
-            fi
+            echo "Current uWolf App Version from manifest.json: $CURRENT_APP_VERSION"
           else
             echo "Error: manifest.json not found in repository root. Defaulting to 0.0.0."
             CURRENT_APP_VERSION="0.0.0"
           fi
-
-          echo "current_app_version=$CURRENT_APP_VERSION" >> $GITHUB_OUTPUT
+          echo "current_app_version=$CURRENT_APP_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Determine New Release Version and Build Trigger
         id: determine_build_info
