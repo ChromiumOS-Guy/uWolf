@@ -152,7 +152,7 @@ jobs:
           fi
 
           # Decide if we need to build based on the correct logic
-          if [ "$NEWER_LIBREWOLF_AVAILABLE" == true ]; then
+          if [ "$NEWER_LIBREWOLF_AVAILABLE" = true ]; then
             SHOULD_BUILD=true
             echo "Reason to build: Newer LibreWolf version is available ($GITLAB_TAG)."
             # If current app version matches the last *released* app tag, increment patch
