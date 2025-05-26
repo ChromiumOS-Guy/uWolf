@@ -106,6 +106,7 @@ jobs:
 
       - name: Determine if Build is Needed and New uWolf App Version
         id: determine_build_info
+        shell: bash # Explicitly use bash for this crucial step
         run: |
           GITLAB_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}" 
           LAST_PROCESSED_LW_TAG="${{ steps.get_last_processed_lw_tag.outputs.last_processed_lw_tag }}" 
