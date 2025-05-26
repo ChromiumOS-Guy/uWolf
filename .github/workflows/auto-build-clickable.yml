@@ -265,7 +265,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.determine_build_info.outputs.new_uwolf_app_version_tag }}
-          name: Alpha uWolf ${{ steps.determine_build_info.outputs.new_uwolf_app_version_tag }}
+          name: uWolf ${{ steps.determine_build_info.outputs.new_uwolf_app_version_tag }} (Alpha)
           body: |
             Automated **Alpha Release** for uWolf version `${{ steps.determine_build_info.outputs.new_uwolf_app_version_tag }}`.
             
