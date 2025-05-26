@@ -20,11 +20,13 @@ jobs:
           apt-get update
           apt-get install -y jq curl git
 
-      - name: Configure Git for Auto-Commit
+      - name: Configure Git for Auto-Commit and Safe Directory
         # This is necessary if we're going to push changes back to the repo (e.g., auto-increment manifest.json)
+        # And to fix dubious ownership errors in container environments.
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
+          git config --global --add safe.directory /__w/uWolf/uWolf # <-- ADDED THIS LINE
 
       - name: Checkout repository and submodules
         # We need to checkout unconditionally because we always read manifest.json and .last_librewolf_tag
@@ -49,10 +51,7 @@ jobs:
           if [ -z "$EFFECTIVE_URL" ]; then
             echo "Error: Could not retrieve effective URL from GitLab permalink. No redirect happened or curl failed."
             echo "gitlab_tag=v0.0.0" >> "$GITHUB_OUTPUT"
-            # We don't exit 0 here, because if there's an error getting the tag, we still want to try building
-            # based on other conditions or proceed with a default. Let determine_release_info handle the build decision.
           else
-            # Extract the LibreWolf tag (e.g., v138.0.4-1)
             GITLAB_TAG=$(basename "$EFFECTIVE_URL")
             if [ -z "$GITLAB_TAG" ]; then
               echo "Error: Could not extract tag from the effective URL: $EFFECTIVE_URL"
@@ -118,8 +117,7 @@ jobs:
       - name: Determine New Release Version and Build Trigger
         id: determine_build_info
         run: |
-          # Enable strict error checking and command tracing for debugging
-          set -eux # Keep set -eux for debugging, remove -o pipefail and here strings
+          set -eux 
 
           GITLAB_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}"
           LAST_PROCESSED_LW_TAG="${{ steps.get_last_processed_lw_tag.outputs.last_processed_lw_tag }}"
@@ -127,23 +125,20 @@ jobs:
           CURRENT_APP_VERSION_RAW="${{ steps.get_current_app_version.outputs.current_app_version }}"
           CURRENT_APP_VERSION_WITH_V="v$CURRENT_APP_VERSION_RAW"
 
-          NEW_UWOOLF_APP_VERSION_RAW="$CURRENT_APP_VERSION_RAW" # Proposed new version for manifest.json
-          SHOULD_BUILD_FLAG=0 # 0 for false, 1 for true
-          COMMIT_REQUIRED_FLAG=0 # 0 for false, 1 for true
+          NEW_UWOOLF_APP_VERSION_RAW="$CURRENT_APP_VERSION_RAW"
+          SHOULD_BUILD_FLAG=0
+          COMMIT_REQUIRED_FLAG=0
 
           echo "Incoming LibreWolf Tag: $GITLAB_TAG"
           echo "Last Processed LibreWolf Tag: $LAST_PROCESSED_LW_TAG"
           echo "Current uWolf App Version (from manifest): $CURRENT_APP_VERSION_WITH_V"
           echo "Last Released uWolf App Tag (from GitHub releases): $LAST_RELEASED_APP_TAG"
 
-          # Ensure tags are not empty for comparison (already handled by defaults, but defensive)
           [ -z "$GITLAB_TAG" ] && GITLAB_TAG="v0.0.0"
           [ -z "$LAST_PROCESSED_LW_TAG" ] && LAST_PROCESSED_LW_TAG="v0.0.0"
           [ -z "$LAST_RELEASED_APP_TAG" ] && LAST_RELEASED_APP_TAG="v0.0.0"
           [ -z "$CURRENT_APP_VERSION_WITH_V" ] && CURRENT_APP_VERSION_WITH_V="v0.0.0"
 
-          # Condition 1: Compare LibreWolf tag with the last *processed* LibreWolf tag
-          # If different, we should build.
           NEWER_LIBREWOLF_AVAILABLE_FLAG=0
           HIGHEST_LW_OF_TWO=$(printf "%s\n%s" "$LAST_PROCESSED_LW_TAG" "$GITLAB_TAG" | sort -V | tail -n 1)
           if [ "$GITLAB_TAG" = "$HIGHEST_LW_OF_TWO" ] && [ "$GITLAB_TAG" != "$LAST_PROCESSED_LW_TAG" ]; then
@@ -153,8 +148,6 @@ jobs:
               echo "Condition 1: No newer LibreWolf upstream."
           fi
 
-          # Condition 2: Compare manifest.json version to latest released uWolf tag
-          # If different, we should build (manual manifest update).
           UWOOLF_MANIFEST_VERSION_UPDATED_FLAG=0
           if [ "$CURRENT_APP_VERSION_WITH_V" != "$LAST_RELEASED_APP_TAG" ]; then
             UWOOLF_MANIFEST_VERSION_UPDATED_FLAG=1
@@ -163,29 +156,23 @@ jobs:
             echo "Condition 2: Current uWolf App Version is same as last released."
           fi
 
-          # Decision Logic for SHOULD_BUILD_FLAG and NEW_UWOOLF_APP_VERSION_RAW
           if [ "$NEWER_LIBREWOLF_AVAILABLE_FLAG" -eq 1 ]; then
             SHOULD_BUILD_FLAG=1
             echo "Reason to build: Newer LibreWolf version is available ($GITLAB_TAG)."
-            # If current app version in manifest is the same as the last *released* app tag,
-            # this means we need to increment the patch to make a new unique release.
             if [ "$CURRENT_APP_VERSION_WITH_V" = "$LAST_RELEASED_APP_TAG" ]; then
               echo "  Current uWolf App Version ($CURRENT_APP_VERSION_WITH_V) is already used for a release."
               echo "  Incrementing patch for a new build based on LibreWolf update."
-              # POSIX-compliant way to read version components
               echo "$CURRENT_APP_VERSION_RAW" | IFS='.' read -r MAJOR MINOR PATCH
               NEW_PATCH=$((PATCH + 1))
               NEW_UWOOLF_APP_VERSION_RAW="$MAJOR.$MINOR.$NEW_PATCH"
-              COMMIT_REQUIRED_FLAG=1 # Need to commit manifest.json change
+              COMMIT_REQUIRED_FLAG=1
               echo "  New proposed uWolf App Version (raw): $NEW_UWOOLF_APP_VERSION_RAW"
             else
               echo "  Current uWolf App Version ($CURRENT_APP_VERSION_WITH_V) was manually updated. No patch increment needed."
-              # Use the current manifest version as is.
             fi
           elif [ "$UWOOLF_MANIFEST_VERSION_UPDATED_FLAG" -eq 1 ]; then
             SHOULD_BUILD_FLAG=1
             echo "Reason to build: uWolf manifest.json version was manually updated ($CURRENT_APP_VERSION_WITH_V)."
-            # No patch increment here, use the version from manifest.json as is.
           else
             echo "No reason to build: No new LibreWolf, and current uWolf App Version is already released."
           fi
@@ -194,13 +181,11 @@ jobs:
           echo "Final Proposed uWolf App Version (raw): $NEW_UWOOLF_APP_VERSION_RAW"
           echo "Commit manifest.json and .last_librewolf_tag required: $( [ "$COMMIT_REQUIRED_FLAG" -eq 1 ] && echo "true" || echo "false" )"
 
-          # Set outputs for subsequent steps
           echo "run_clickable=$( [ "$SHOULD_BUILD_FLAG" -eq 1 ] && echo "true" || echo "false" )" >> "$GITHUB_OUTPUT"
           echo "new_uwolf_app_version_tag=v$NEW_UWOOLF_APP_VERSION_RAW" >> "$GITHUB_OUTPUT"
           echo "commit_required=$( [ "$COMMIT_REQUIRED_FLAG" -eq 1 ] && echo "true" || echo "false" )" >> "$GITHUB_OUTPUT"
           echo "current_lw_tag_for_this_build=$GITLAB_TAG" >> "$GITHUB_OUTPUT"
 
-      # This is the debug step to confirm outputs seen by GitHub Actions
       - name: Debug Workflow Outputs
         run: |
           echo "Debugging outputs from determine_build_info step:"
@@ -211,17 +196,14 @@ jobs:
           echo "--- End Debug ---"
 
       - name: Update manifest.json and .last_librewolf_tag file (if required)
-        # This step runs if a build is triggered OR if a manifest commit is required (e.g., patch increment)
         if: ${{ steps.determine_build_info.outputs.commit_required == 'true' || steps.determine_build_info.outputs.run_clickable == 'true' }}
         run: |
-          set -eux # For debugging this step too
+          set -eux
 
           NEW_UWOOLF_APP_VERSION_RAW="${{ steps.determine_build_info.outputs.new_uwolf_app_version_tag }}"
-          # Remove 'v' prefix if it exists, as manifest.json typically uses "X.Y.Z"
           NEW_UWOOLF_APP_VERSION_MANIFEST="${NEW_UWOOLF_APP_VERSION_RAW#v}" 
           CURRENT_LW_TAG_FOR_THIS_BUILD="${{ steps.determine_build_info.outputs.current_lw_tag_for_this_build }}"
 
-          # Update manifest.json only if an increment happened
           if [ "${{ steps.determine_build_info.outputs.commit_required }}" = "true" ]; then
             echo "Updating manifest.json to version $NEW_UWOOLF_APP_VERSION_MANIFEST"
             jq ".version = \"$NEW_UWOOLF_APP_VERSION_MANIFEST\"" manifest.json > manifest.json.tmp && mv manifest.json.tmp manifest.json
@@ -230,17 +212,14 @@ jobs:
             echo "No manifest.json version update required (commit_required was false)."
           fi
 
-          # Always update .last_librewolf_tag if we are building/releasing (even if no manifest commit)
           echo "Updating .last_librewolf_tag to $CURRENT_LW_TAG_FOR_THIS_BUILD"
           echo "$CURRENT_LW_TAG_FOR_THIS_BUILD" > .last_librewolf_tag
           git add .last_librewolf_tag
 
-          # Only commit and push if there are changes to commit
-          if ! git diff --quiet --exit-code; then # Check if there are any uncommitted changes at all
+          if ! git diff --cached --quiet --exit-code; then # Check staged changes
             echo "Changes detected. Committing now."
-            # Use the actual new version from the manifest (or the one determined for commit)
             git commit -am "chore: Automated update for uWolf version to $NEW_UWOOLF_APP_VERSION_MANIFEST (LibreWolf $CURRENT_LW_TAG_FOR_THIS_BUILD)"
-            git push origin HEAD:${{ github.ref_name }} # Push to the current branch
+            git push origin HEAD:${{ github.ref_name }}
           else
             echo "No changes to commit."
           fi
@@ -282,11 +261,10 @@ jobs:
       - name: Create Secondary LibreWolf Tag
         if: ${{ steps.determine_build_info.outputs.run_clickable == 'true' }}
         run: |
-          set -eux # For debugging this step too
+          set -eux
           LIBREWOLF_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}"
           
           echo "Creating secondary Git tag for LibreWolf version: $LIBREWOLF_TAG"
-          # Ensure the tag is not empty AND doesn't already exist
           if [ -n "$LIBREWOLF_TAG" ] && ! git rev-parse --verify "refs/tags/$LIBREWOLF_TAG" >/dev/null 2>&1; then
             git tag "$LIBREWOLF_TAG"
             git push origin "refs/tags/$LIBREWOLF_TAG"
