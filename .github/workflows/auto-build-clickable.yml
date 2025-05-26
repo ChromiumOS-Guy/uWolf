@@ -2,51 +2,55 @@ name: Monitor GitLab Tag and Create Alpha Release
 
 on:
   schedule:
-    - cron: '0 * * * *' # Run every hour. Adjust as needed (e.g., '0 0 * * *' for daily)
-  workflow_dispatch: # Allows manual trigger
+    - cron: '0 * * * *' # Runs every hour. Adjust as needed (e.g., '0 0 * * *' for daily at midnight UTC)
+  workflow_dispatch: # Allows you to manually trigger the workflow from the GitHub Actions tab
 
 jobs:
   check-and-release:
-    runs-on: ubuntu-latest
-    container: clickable/ci-20.04-amd64 # Use the specified Docker image
+    runs-on: ubuntu-latest # Uses a GitHub-hosted runner with Ubuntu
+    container: clickable/ci-20.04-amd64 # Specifies the Docker image for the job to run inside
 
-    # Permissions for GitHub API access (to read our own releases and create new ones)
+    # Permissions required for creating releases and tags in your repository
     permissions:
-      contents: write # Required for softprops/action-gh-release to create releases and tags
-      pull-requests: write # Recommended for some release actions, though not strictly needed here for basic release
+      contents: write # Needed for softprops/action-gh-release to create releases and push tags
 
     steps:
-      - name: Install jq
+      - name: Install Utilities (jq, curl)
         run: |
           apt-get update
           apt-get install -y jq curl
 
-      - name: Get latest GitLab release tag
-        id: get_gitlab_tag
+      - name: Get latest GitLab release tag (Following Redirects)
+        id: get_gitlab_tag # Assigns an ID to this step to access its outputs later
         run: |
-          # Project ID for librewolf-community/browser/appimage
+          # The project ID for librewolf-community/browser/appimage
           GITLAB_PROJECT_ID="24386000"
-          GITLAB_API_URL="https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/releases/permalink/latest"
+          GITLAB_PERMALINK_URL="https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/releases/permalink/latest"
 
-          echo "Fetching latest GitLab release from: $GITLAB_API_URL"
-          GITLAB_RESPONSE=$(curl -s "$GITLAB_API_URL")
+          echo "Attempting to fetch latest GitLab release tag via permalink and follow redirects from: $GITLAB_PERMALINK_URL"
 
-          # Check if the response is empty or indicates an error
-          if [ -z "$GITLAB_RESPONSE" ]; then
-            echo "Error: Empty response from GitLab API. Exiting."
-            exit 1
+          # Use curl -L to follow redirects, -o /dev/null to discard content,
+          # and -w '%{url_effective}' to print the final URL after redirects.
+          EFFECTIVE_URL=$(curl -s -L -o /dev/null -w '%{url_effective}' "$GITLAB_PERMALINK_URL")
+
+          echo "Effective (redirected) URL: $EFFECTIVE_URL"
+
+          if [ -z "$EFFECTIVE_URL" ]; then
+            echo "Error: Could not retrieve effective URL from GitLab permalink. No redirect happened or curl failed."
+            echo "gitlab_tag=v0.0.0" >> $GITHUB_OUTPUT # Set a safe baseline tag
+            exit 0 # Exit gracefully if no URL, but allow workflow to continue with baseline
           fi
 
-          GITLAB_TAG=$(echo "$GITLAB_RESPONSE" | jq -r '.tag_name')
+          # Extract the tag from the last segment of the URL path (e.g., v138.0.4-1)
+          GITLAB_TAG=$(basename "$EFFECTIVE_URL")
 
-          if [ "$GITLAB_TAG" == "null" ] || [ -z "$GITLAB_TAG" ]; then
-            echo "Error: Could not extract tag_name from GitLab API response."
-            echo "Response: $GITLAB_RESPONSE"
-            exit 1
+          if [ -z "$GITLAB_TAG" ]; then
+            echo "Error: Could not extract tag from the effective URL: $EFFECTIVE_URL"
+            echo "gitlab_tag=v0.0.0" >> $GITHUB_OUTPUT # Set a safe baseline
+          else
+            echo "Latest GitLab Tag: $GITLAB_TAG"
+            echo "gitlab_tag=$GITLAB_TAG" >> $GITHUB_OUTPUT
           fi
-
-          echo "Latest GitLab Tag: $GITLAB_TAG"
-          echo "gitlab_tag=$GITLAB_TAG" >> $GITHUB_OUTPUT
 
       - name: Get latest GitHub release tag from this repo
         id: get_github_tag
@@ -58,13 +62,14 @@ jobs:
           echo "Fetching latest GitHub release from: $GITHUB_API_URL"
           GITHUB_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_API_URL")
 
-          # Check if the response is empty or indicates no releases exist yet
+          # Check if the response indicates no releases exist yet in this repo
           if echo "$GITHUB_RESPONSE" | jq -e 'has("message") and .message == "Not Found"' >/dev/null; then
             echo "No existing GitHub releases found in this repository."
             LATEST_GITHUB_TAG="v0.0.0" # Set a baseline for comparison
           else
-            LATEST_GITHUB_TAG=$(echo "$GITHUB_RESPONSE" | jq -r '.tag_name')
-            if [ "$LATEST_GITHUB_TAG" == "null" ] || [ -z "$LATEST_GITHUB_TAG" ]; then
+            # Extract the tag_name; use // empty to handle null gracefully
+            LATEST_GITHUB_TAG=$(echo "$GITHUB_RESPONSE" | jq -r '.tag_name // empty')
+            if [ -z "$LATEST_GITHUB_TAG" ]; then
               echo "Error: Could not extract tag_name from GitHub API response. Assuming v0.0.0"
               echo "Response: $GITHUB_RESPONSE"
               LATEST_GITHUB_TAG="v0.0.0" # Fallback
@@ -74,7 +79,7 @@ jobs:
           echo "Latest GitHub Tag: $LATEST_GITHUB_TAG"
           echo "github_tag=$LATEST_GITHUB_TAG" >> $GITHUB_OUTPUT
 
-      - name: Compare versions and set output
+      - name: Compare versions and determine if build is needed
         id: compare_versions
         run: |
           GITLAB_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}"
@@ -82,45 +87,63 @@ jobs:
 
           echo "Comparing GitLab Tag ($GITLAB_TAG) with GitHub Tag ($GITHUB_TAG)"
 
-          # Use sort -V for semantic version comparison
-          # If GITLAB_TAG is greater than GITHUB_TAG, then the echo will print GITLAB_TAG first
-          # If they are equal, it will print GITLAB_TAG first, but they are the same
-          # If GITHUB_TAG is greater, then echo will print GITHUB_TAG first
+          # Ensure tags are not empty before semantic version comparison
+          if [ -z "$GITLAB_TAG" ]; then GITLAB_TAG="v0.0.0"; fi
+          if [ -z "$GITHUB_TAG" ]; then GITHUB_TAG="v0.0.0"; fi
+
+          # Use sort -V for robust semantic version comparison
+          # The highest tag will be the last element after sorting
           HIGHEST_TAG=$(printf "%s\n%s" "$GITLAB_TAG" "$GITHUB_TAG" | sort -V | tail -n 1)
 
+          # Proceed only if the GitLab tag is the highest AND it's different from our current GitHub tag
           if [ "$GITLAB_TAG" = "$HIGHEST_TAG" ] && [ "$GITLAB_TAG" != "$GITHUB_TAG" ]; then
-            echo "Newer GitLab tag detected: $GITLAB_TAG"
+            echo "Newer GitLab tag detected: $GITLAB_TAG. Initiating build and release."
             echo "run_clickable=true" >> $GITHUB_OUTPUT
             echo "new_release_tag=$GITLAB_TAG" >> $GITHUB_OUTPUT
           else
-            echo "No newer GitLab tag found. Current: $GITLAB_TAG, Latest in GitHub: $GITHUB_TAG"
+            echo "No newer GitLab tag found or version already released."
+            echo "Current GitLab: $GITLAB_TAG, Latest in GitHub: $GITHUB_TAG"
             echo "run_clickable=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Checkout repository and submodules
+        # Only checkout if a build is actually going to happen
+        if: steps.compare_versions.outputs.run_clickable == 'true'
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive # Ensures Git submodules are initialized and updated
+
       - name: Build Click package for arm64
+        # This step runs only if a newer version was detected
         if: steps.compare_versions.outputs.run_clickable == 'true'
         run: clickable build --arch arm64 --skip-review
 
       - name: Upload Click package artifacts (for workflow run)
+        # Uploads artifacts, helpful for debugging or quick downloads
         if: steps.compare_versions.outputs.run_clickable == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: click-packages-arm64-${{ steps.compare_versions.outputs.new_release_tag }}
-          path: build/*/app/*.click
-          retention-days: 7
+          name: click-packages-arm64-${{ steps.compare_versions.outputs.new_release_tag }} # Unique name with tag
+          path: build/*/app/*.click # Path to your generated Click packages
+          retention-days: 7 # Keep artifacts for 7 days
 
       - name: Create Alpha Release
+        # Creates a new GitHub Release only if a newer version was detected
         if: steps.compare_versions.outputs.run_clickable == 'true'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2 # A popular action for creating releases
         with:
-          tag_name: ${{ steps.compare_versions.outputs.new_release_tag }} # Use the new GitLab tag
-          name: Alpha ${{ steps.compare_versions.outputs.new_release_tag }} # Set release name to "Alpha <version>"
-          body: |
-            Automated Alpha release for version ${{ steps.compare_versions.outputs.new_release_tag }}
-            This release is based on the upstream GitLab tag: ${{ steps.compare_versions.outputs.new_release_tag }}
-          prerelease: true # Mark as a pre-release (alpha)
-          draft: false
-          files: build/*/app/*.click # Attach the built files
+          tag_name: ${{ steps.compare_versions.outputs.new_release_tag }} # The Git tag for the release
+          name: Alpha ${{ steps.compare_versions.outputs.new_release_tag }} # The display name of the release
+          body: | # Markdown content for the release description
+            Automated **Alpha Release** for version ${{ steps.compare_versions.outputs.new_release_tag }}.
+            This build is based on the upstream GitLab tag: `${{ steps.compare_versions.outputs.new_release_tag }}`.
+            
+            This is an automated build and may contain the latest changes.
+            
+            ---
+            *Built by GitHub Actions*
+          prerelease: true # Marks this as a pre-release (suitable for 'alpha')
+          draft: false # Set to true if you want to review and publish manually
+          files: build/*/app/*.click # Attaches the generated .click files as release assets
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required for this action
- 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required for this action to interact with GitHub API
