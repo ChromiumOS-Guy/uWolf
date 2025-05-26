@@ -80,7 +80,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          GITHUB_API_URL="https://api.github.com/repos/${{ github.repository }}/releases/latest"
+          GITHUB_API_URL="https://api.github.com/repos/ChromiumOS-Guy/uWolf/releases/latest"
           echo "Fetching latest uWolf app release tag from: $GITHUB_API_URL"
           GITHUB_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_API_URL")
           LATEST_GITHUB_APP_TAG=""
