@@ -137,7 +137,7 @@ jobs:
 
           GITLAB_TAG="${{ steps.get_gitlab_tag.outputs.gitlab_tag }}"
           LAST_PROCESSED_LW_TAG="${{ steps.get_last_processed_lw_tag.outputs.last_processed_lw_tag }}"
-          LAST_RELEASED_APP_TAG="${{ steps.get_github_app_tag.outputs.github_app_tag }}"
+          LAST_RELEASED_APP_TAG="${{ steps.get_github_app_tag.outputs.latest_github_app_tag }}"
           CURRENT_APP_VERSION_RAW="${{ steps.get_current_app_version.outputs.current_app_version }}"
           CURRENT_APP_VERSION_WITH_V="v$CURRENT_APP_VERSION_RAW"
 
