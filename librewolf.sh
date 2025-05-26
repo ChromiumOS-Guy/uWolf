@@ -15,6 +15,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 import os
+import subprocess
 
 os.environ["MOZ_USE_XINPUT2"] = "1"
 #os.environ["GDK_SCALE"]=str(float(os.environ["GRID_UNIT_PX"]/8)) # old
