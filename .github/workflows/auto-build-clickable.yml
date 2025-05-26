@@ -158,3 +158,4 @@ jobs:
           files: build/*/app/*.click # Attach the built files
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required for this action
+ 
