@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=uWolf
-Exec=librewolf.sh
+Exec=librewolf.sh %u
 Icon=bin/librewolf.png
 Terminal=false
 Type=Application

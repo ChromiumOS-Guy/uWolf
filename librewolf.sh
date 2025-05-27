@@ -15,6 +15,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 import os
+import sys
 from profile import profile, chrome, librewolf_overrides
 
 #### profile stuff
@@ -32,7 +33,13 @@ os.environ["GTK_IM_MODULE_FILE"] = "lib/@CLICK_ARCH@/gtk-3.0/3.0.0/immodules/imm
 # Force Wayland
 # os.environ["MOZ_ENABLE_WAYLAND"] = "1"
 
-os.execlp("bin/librewolf","bin/librewolf")
 
-
-
+if len(sys.argv) > 1:
+    url_to_open = sys.argv[1]
+    # Pass the URL as an argument to librewolf
+    # The first argument to execlp after the executable name is argv[0] for the new process,
+    # so we repeat "bin/librewolf" and then add the actual arguments.
+    os.execlp("bin/librewolf", "bin/librewolf", url_to_open)
+else:
+    # If no URL is provided, just launch librewolf normally
+    os.execlp("bin/librewolf","bin/librewolf")
