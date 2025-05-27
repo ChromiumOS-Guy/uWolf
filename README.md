@@ -18,7 +18,7 @@ if the browser is too small or too big please send me the output of this:
 * Extra screen on launch due to xwayland
 * No hardware acceleration (coming with mir2.x on Noble)
 * Fixed ratio scaling issues
-* buggy suggestion/autofill menu on searchbar
+* Buggy suggestion/autofill menu on searchbar
 
 ### License
 
