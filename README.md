@@ -20,6 +20,7 @@ if the browser is too small or too big please send me the output of this:
 * Fixed ratio scaling issues
 * Buggy suggestion/autofill menu on searchbar
 * OSK hides content
+* On some devices OSK theme changes based on browser theme. 
 
 ### License
 
