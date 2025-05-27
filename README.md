@@ -19,6 +19,7 @@ if the browser is too small or too big please send me the output of this:
 * No hardware acceleration (coming with mir2.x on Noble)
 * Fixed ratio scaling issues
 * Buggy suggestion/autofill menu on searchbar
+* OSK hides content
 
 ### License
 
