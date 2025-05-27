@@ -1,10 +1,15 @@
 # uWolf
 
 A UT LibreWolf Wrapper for LibreWolf Firefox Based Browser.
-switch between desktop/mobile mode by enabling/disabiling resistgfingerprinting (or install and extension to switch useragents)
 
 if the browser is too small or too big please send me the output of this:
 ```echo $GRID_UNIT_PX```  with device name as issue 
+
+## know Issues
+* Extra screen on launch due to xwayland
+* No hardware acceleration (coming with mir2.x on Noble)
+* Fixed ratio scaling issues
+* buggy suggestion/autofill menu on searchbar
 
 ### License
 
