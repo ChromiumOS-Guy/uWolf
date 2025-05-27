@@ -1,0 +1,335 @@
+/*
+ * declutter-searchbar.css
+ * This file contains styles specifically for positioning and styling the URL/search bar at the top,
+ * ensuring its autofill suggestions appear downwards, and keeping only the tabs bar visible.
+ * It should be imported into userChrome.css.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* Global Adjustments for Content Area */
+/* No specific padding-bottom needed as no fixed elements are at the bottom. */
+#browser {
+  padding-bottom: 0 !important; /* Reset padding-bottom */
+}
+
+/* -------------------------------------------------------------------------- */
+/* 1. URL/Search Bar Styling - Keep on Top */
+/* Ensure the main navigation bar (#nav-bar) is visible and at the top */
+#nav-bar {
+  display: flex !important; /* Use flexbox for internal layout */
+  visibility: visible !important; /* Ensure it's visible */
+  order: -1 !important; /* Attempt to force it to the very top within its parent */
+  background-color: var(--lwt-accent-color, #2d2d2d) !important; /* Background color for the top bar */
+  padding: 0 !important; /* Keep this at 0 for no internal padding on nav-bar itself */
+  box-sizing: border-box !important; /* Include padding in the width calculation */
+  border-bottom: 1px solid var(--lwt-toolbar-border-color, rgba(0,0,0,0.1)) !important; /* Subtle bottom border */
+  width: 100vw !important; /* Ensure it spans the full viewport width */
+  margin-top: 0 !important; /* Explicitly remove top margin */
+  margin-bottom: 0 !important; /* Explicitly remove bottom margin */
+  position: relative !important; /* Ensure it takes up space in the normal flow */
+  /* Re-added padding-left here, as this is the primary way to push content over */
+  padding-left: 70px !important; /* This creates the initial offset */
+  min-height: unset !important; /* Remove any minimum height that might add space */
+  height: auto !important; /* Allow height to adjust to content */
+}
+
+/* IMPORTANT: Add a pseudo-element at the end of the flex container to act as a stopping point */
+/* This effectively gives a "right margin" or "end boundary" for the flex items */
+#nav-bar::after {
+  content: ""; /* Essential for pseudo-elements */
+  display: block !important; /* Make it a block-level element */
+  width: 1px !important; /* Minimal width for the "stop" */
+  flex-shrink: 0 !important; /* Ensure it doesn't shrink to 0 */
+  flex-grow: 0 !important; /* Ensure it doesn't grow */
+  /* You might need a small right margin on the urlbar itself
+     or this ::after element if there's other stuff after urlbar */
+  margin-left: 5px !important; /* Small margin to ensure some space after urlbar */
+}
+
+
+#urlbar {
+  text-align: center !important; /* Center the URL bar text */
+  border-radius: 20px !important; /* More rounded corners */
+  background-color: var(--lwt-toolbar-field-background-color, rgba(255,255,255,0.2)) !important;
+  color: var(--lwt-toolbar-field-color, white) !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 8px 15px !important; /* Internal padding for the input field */
+  flex-grow: 1 !important; /* Allow the urlbar to take available space */
+  flex-shrink: 1 !important; /* Allow it to shrink if needed */
+  max-width: none !important; /* Allow it to expand fully within its flex context */
+  width: unset !important; /* Allow flexbox to control its width */
+  min-height: unset !important; /* Remove any minimum height that might add space */
+  min-width: 0px !important; /* Allow the content of urlbar to shrink if necessary */
+}
+
+/* Adjust the search button/icons within the urlbar if they appear off */
+#urlbar .urlbar-icon {
+  margin: 0 5px !important; /* Ensure margin is applied correctly */
+}
+
+/* Hide the default search icon in the urlbar if it's redundant */
+#urlbar-input-container .urlbar-icon-wrapper {
+  display: none !important;
+}
+
+/* Ensure the urlbar's children are laid out correctly */
+#urlbar-input-container {
+  display: flex !important; /* Use flex for internal layout */
+  align-items: center !important;
+  width: 100% !important; /* Take full width of its container (which is #urlbar) */
+  min-height: unset !important;
+}
+
+/* Make nav-bar buttons more touch-friendly */
+#nav-bar .toolbarbutton-1:not(#PanelUI-button) {
+  padding: 10px 12px !important; /* Increase padding for a larger touch target */
+  margin: 0 4px !important; /* Add horizontal margin between buttons */
+  border-radius: 8px !important; /* Slightly rounded corners for buttons */
+  transition: background-color 0.2s ease !important; /* Smooth transition on hover/active */
+  flex-shrink: 0 !important; /* Ensure these buttons don't shrink */
+}
+
+#nav-bar .toolbarbutton-1:not(#PanelUI-button):hover {
+  background-color: rgba(255, 255, 255, 0.1) !important; /* Subtle hover effect */
+}
+
+/* -------------------------------------------------------------------------- */
+/* 2. Autofill Suggestions (URL bar results) to open DOWNWARDS (default behavior) */
+#urlbar-results {
+  /* Revert positioning for default behavior */
+  position: relative !important; /* Default positioning */
+  bottom: auto !important; /* Remove bottom constraint */
+  left: auto !important;
+  right: auto !important;
+  width: auto !important; /* Remove width constraint */
+  
+  /* --- KEY CHANGES FOR SMALL SCREENS --- */
+  /* Limit height to a percentage of the viewport height */
+  max-height: 50vh !important; /* Adjust this value (e.g., 50vh, 60vh) */
+  /* Add a scrollbar when content exceeds max-height */
+  overflow-y: auto !important; 
+  /* --- END KEY CHANGES --- */
+
+  background-color: var(--lwt-accent-color, rgba(45, 45, 45, 0.98)) !important; /* Keep styling */
+  border-top: none !important; /* No top border if it's below urlbar */
+  border-bottom: 1px solid var(--lwt-toolbar-border-color, rgba(0,0,0,0.3)) !important; /* Add bottom border */
+  box-shadow: 0 5px 20px rgba(0,0,0,0.6) !important; /* Standard shadow */
+  z-index: auto !important; /* Remove z-index */
+  border-radius: 0 0 15px 15px !important; /* Rounded bottom corners */
+  padding-top: 0 !important; /* Remove top padding */
+}
+
+/* Ensure individual result items are visible and styled */
+.urlbar-result {
+  padding: 10px 15px !important;
+  color: var(--lwt-toolbar-color, white) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+.urlbar-result:last-child {
+  border-bottom: none !important;
+}
+
+.urlbar-result[selected] {
+  background-color: rgba(255,255,255,0.15) !important;
+}
+
+/* Hide some elements within urlbar results that might be redundant */
+.urlbar-result-action, /* Actions like remove from history */
+.urlbar-result-type-icon /* Type icon (star, clock) */ {
+  display: none !important;
+}
+
+/* Specific styling for the search term within the result */
+.urlbar-result-match {
+  font-weight: bold !important;
+  color: var(--lwt-toolbar-field-color, white) !important;
+}
+
+/* For results with multiple lines (e.g., title + URL) */
+.urlbar-result-url,
+.urlbar-result-title {
+  color: var(--lwt-toolbar-color, #CCCCCC) !important;
+  font-size: 0.9em !important;
+}
+.urlbar-result-url { display: block !important; } /* Ensure URL is on new line */
+
+/* -------------------------------------------------------------------------- */
+/* 3. Hide all other UI except search bar, tabs bar, and settings button */
+
+/* Ensure Tabs Bar is visible */
+#TabsToolbar {
+  visibility: visible !important;
+  display: flex !important; /* Use flexbox for tabs layout */
+  margin-top: 0 !important; /* Explicitly remove top margin */
+  margin-bottom: 0 !important; /* Explicitly remove bottom margin */
+  padding-top: 0 !important; /* Explicitly remove top padding */
+  padding-bottom: 0 !important; /* Explicitly remove bottom padding */
+  min-height: unset !important; /* Remove any minimum height that might add space */
+  height: auto !important; /* Allow height to adjust to content */
+  /* This is the key part to try and offset */
+  transform: translateY(-2px) !important; /* Experiment with negative values here */
+}
+
+/* Hide specific toolbars and main UI elements without affecting content */
+#PersonalToolbar, /* The bookmarks bar */
+#toolbar-menubar, /* The traditional menu bar (File, Edit, View, etc.) */
+#titlebar, /* The native window title bar */
+#customization-toolbar, /* If there's a customization toolbar */
+#addon-bar, /* Older addon bar */
+#status-bar, /* The status bar at the very bottom */
+#browser-bottombox, /* Any general bottom box */
+/* #PanelUI-button, This is the 3-dot menu button - REMOVED from hidden list */
+#unified-extensions-button, /* Unified extensions button */
+#home-button, /* Home button */
+#stop-button, /* Stop button */
+#customizable-toolbar-button, /* Customize toolbar button */
+#library-button, /* Library button */
+#downloads-button, /* Downloads button */
+#sidebar-button, /* Sidebar button */
+#fxa-toolbar-menu-button, /* Firefox Account button */
+#page-action-buttons, /* Page action buttons (e.g., bookmark star) */
+#urlbar-search-button, /* Search button within urlbar */
+#tracking-protection-icon-container, /* Tracking protection icon */
+#identity-box, /* Site identity box (lock icon) */
+#reader-mode-button, /* Reader mode button */
+#urlbar-go-button, /* Go button for urlbar */
+#urlbar-zoom-button, /* Zoom button */
+#urlbar-share-button, /* Share button */
+#urlbar-camera-button, /* Camera button */
+#urlbar-microphone-button, /* Microphone button */
+#urlbar-qrcode-button, /* QR code button */
+#urlbar-screenshot-button, /* Screenshot button */
+#urlbar-translate-button, /* Translate button */
+#urlbar-pocket-button, /* Pocket button */
+#urlbar-send-to-device-button, /* Send to device button */
+#urlbar-print-button, /* Print button */
+#urlbar-find-button, /* Find button */
+#urlbar-developer-button, /* Developer tools button */
+#urlbar-more-tools-button, /* More tools button */
+#urlbar-web-developer-button, /* Web developer menu button */
+#urlbar-add-ons-button, /* Add-ons button */
+#urlbar-customize-button, /* Customize button */
+#urlbar-full-screen-button, /* Full screen button */
+#urlbar-new-window-button, /* New window button */
+#urlbar-new-private-window-button, /* New private window button */
+#urlbar-history-button, /* History button */
+#urlbar-downloads-button, /* Downloads button */
+#urlbar-bookmarks-button, /* Bookmarks button */
+#urlbar-sync-button, /* Sync button */
+#urlbar-sign-in-button, /* Sign in button */
+#urlbar-sign-out-button, /* Sign out button */
+/* #urlbar-settings-button, */ /* Settings button - REMOVED from hidden list */
+#urlbar-about-button, /* About button */
+#urlbar-feedback-button, /* Feedback button */
+#urlbar-report-site-issue-button, /* Report site issue button */
+#urlbar-save-page-button, /* Save page button */
+#urlbar-email-link-button, /* Email link button */
+#urlbar-cut-button, /* Cut button */
+#urlbar-copy-button, /* Copy button */
+#urlbar-paste-button, /* Paste button */
+#urlbar-undo-button, /* Undo button */
+#urlbar-redo-button, /* Redo button */
+#urlbar-select-all-button, /* Select all button */
+#urlbar-find-on-page-button, /* Find on page button */
+#urlbar-print-button, /* Print button */
+#urlbar-cast-button, /* Cast button */
+#urlbar-picture-in-picture-button, /* Picture-in-picture button */
+#urlbar-web-compat-button, /* Web compatibility button */
+#urlbar-developer-tools-button, /* Developer tools button */
+#urlbar-inspector-button, /* Inspector button */
+#urlbar-debugger-button, /* Debugger button */
+#urlbar-network-monitor-button, /* Network monitor button */
+#urlbar-style-editor-button, /* Style editor button */
+#urlbar-performance-monitor-button, /* Performance monitor button */
+#urlbar-memory-monitor-button, /* Memory monitor button */
+#urlbar-application-monitor-button, /* Application monitor button */
+#urlbar-storage-inspector-button, /* Storage inspector button */
+#urlbar-service-workers-button, /* Service workers button */
+#urlbar-accessibility-inspector-button, /* Accessibility inspector button */
+#urlbar-responsive-design-mode-button, /* Responsive design mode button */
+#urlbar-eyedropper-button, /* Eyedropper button */
+#urlbar-color-picker-button, /* Color picker button */
+#urlbar-font-editor-button, /* Font editor button */
+#urlbar-animations-button, /* Animations button */
+#urlbar-console-button, /* Console button */
+#urlbar-sources-button, /* Sources button */
+#urlbar-elements-button, /* Elements button */
+#urlbar-security-button, /* Security button */
+#urlbar-audits-button, /* Audits button */
+#urlbar-lighthouse-button, /* Lighthouse button */
+#urlbar-application-button, /* Application button */
+#urlbar-manifest-button, /* Manifest button */
+#urlbar-service-worker-button, /* Service worker button */
+#urlbar-cache-storage-button, /* Cache storage button */
+#urlbar-indexeddb-button, /* IndexedDB button */
+#urlbar-local-storage-button, /* Local storage button */
+#urlbar-session-storage-button, /* Session storage button */
+#urlbar-cookies-button, /* Cookies button */
+#urlbar-web-sql-button, /* Web SQL button */
+#urlbar-app-cache-button, /* App cache button */
+#urlbar-clear-storage-button, /* Clear storage button */
+#urlbar-security-panel-button, /* Security panel button */
+#urlbar-network-panel-button, /* Network panel button */
+#urlbar-performance-panel-button, /* Performance panel button */
+#urlbar-memory-panel-button, /* Memory panel button */
+#urlbar-application-panel-button, /* Application panel button */
+#urlbar-storage-panel-button, /* Storage panel button */
+#urlbar-console-panel-button, /* Console panel button */
+#urlbar-sources-panel-button, /* Sources panel button */
+#urlbar-elements-panel-button, /* Elements panel button */
+#urlbar-security-panel-button, /* Security panel button */
+#urlbar-audits-panel-button, /* Audits panel button */
+#urlbar-lighthouse-panel-button {
+  display: none !important;
+  visibility: collapse !important; /* Use both for maximum compatibility */
+}
+
+/* Ensure the main browser content area is not hidden */
+#appcontent, #browser-content-wrapper {
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* NEW: Auto-hide search bar and tabs bar when in full screen */
+/* These rules are placed at the end to maximize their specificity and override potential conflicts. */
+:root[inFullscreen="true"] #nav-bar,
+:root[inFullscreen="true"] #TabsToolbar {
+  display: none !important; /* Use display: none for a more forceful hide */
+}
+
+/* -------------------------------------------------------------------------- */
+/* Position Settings Button at the top left */
+#PanelUI-button {
+  position: fixed !important; /* Fixed position relative to the viewport */
+  top: 10px !important;       /* 10px from the top */
+  left: 10px !important;      /* 10px from the left */
+  right: auto !important;     /* Remove right constraint */
+  bottom: auto !important;    /* Remove bottom constraint */
+  z-index: 9999 !important; /* Ensure it's on top of other elements */
+  background-color: var(--lwt-accent-color, #2d2d2d) !important; /* Match your top bar background */
+  border-radius: 50% !important; /* Make it circular */
+  padding: 0px !important; /* Padding inside the button (icon size handles visual size) */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5) !important; /* Add a subtle shadow */
+  visibility: visible !important; /* Ensure it's visible */
+  display: flex !important; /* Use flex for centering icon if needed */
+  align-items: center !important;
+  justify-content: center !important;
+  /* Make settings button larger for touch-friendliness */
+  width: 44px !important; /* Increased width */
+  height: 44px !important; /* Increased height */
+}
+
+/* Adjust icon within the settings button */
+#PanelUI-button .toolbarbutton-icon {
+  width: 24px !important;
+  height: 24px !important;
+  fill: var(--lwt-toolbar-color, white) !important; /* Icon color */
+}
+
+/* Hide the label if it exists for the button */
+#PanelUI-button .toolbarbutton-text {
+  display: none !important;
+}

@@ -58,4 +58,7 @@ echo "---> copying browser settings" >> $LOG_FILE
 /bin/cp ${ROOT}/settings/custom-prefs.js ${INSTALL_DIR}/bin/browser/defaults/preferences/custom-prefs.js >> $LOG_FILE # copy custom-prefs.js
 /bin/cp ${ROOT}/settings/policies.json ${INSTALL_DIR}/bin/distribution/policies.json >> $LOG_FILE # copy policies.js
 
+# chrome css theme (adapting UI to mobile)
+echo "---> copying browser settings" >> $LOG_FILE
+/bin/cp -r ${ROOT}/profile ${INSTALL_DIR}/ >> $LOG_FILE # copy just copy chrome to browser
 exit 0

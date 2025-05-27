@@ -27,6 +27,4 @@ pref('toolkit.cosmeticAnimations.enabled', false);
 
 // Disable download animations, save CPU
 pref('browser.download.animateNotifications', false);
-pref('webgl.disabled', false);
-pref('privacy.resistFingerprinting', false);
 

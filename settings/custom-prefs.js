@@ -1,6 +1,5 @@
 // librewolf
 pref('toolkit.legacyUserProfileCustomizations.stylesheets', true); // enable css customizations (trust me bro. ,style)
-pref('privacy.resistFingerprinting', false); // makes useragnet overrride possible on librewolf
 
 // privacy
 pref('dom.event.clipboardevents.enabled' , false); // no clipboards for grabby websites
@@ -12,6 +11,8 @@ pref('browser.blink_allowed', false); // fuck blinking text
 pref('media.autoplay.default', 2); // no autoplay (0 allows all, 1 blocks only audio ,2 blocks all media)
 pref('extensions.pocket.enabled', false); // disables Pocket Integration
 pref("browser.theme.dark", true); // dark mode is best mode for mobile
+pref('browser.theme.content-theme', 0);
+pref('browser.theme.toolbar-theme', 0);
 
 
 // UI Hacks
@@ -30,7 +31,6 @@ pref('network.http.max-connections-per-server', 30); // max http(s) connections 
 
 
 // website rendering
-
 pref("general.useragent.override", "Mozilla/5.0 (Android 14; Mobile; rv:136.0) Gecko/136.0 Firefox/136.0"); // make website render for mobile
 pref('content.notify.backoffcount', 5); // reflow adjustment
 pref('content.notify.interval', 849999); // minimum time between reflows
