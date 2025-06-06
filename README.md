@@ -9,7 +9,7 @@ The setup process is straightforward:
  -  Stage 1: On your very first launch, uWolf will download necessary extensions. This takes a moment.
  -  Stage 2: After extensions are ready, a quick restart is needed. This loads the custom mobile UI to make things look right.
 
- It is Important to note that every version update you are encouraged to clear startup cache here: about:support, if there are any problems.
+It is Important to note that every version update you are encouraged to clear startup cache here: about:support, if there are any problems.
 
 Youtube Short Demo: https://youtube.com/shorts/8IigTL3g1t8
 
@@ -23,6 +23,8 @@ if the browser is too small or too big please send me the output of this:
 * On some devices OSK theme changes based on browser theme. (some mitigation added)
 * opening browser for first time through openstore causes it to launch with wayland support (see bug 1 for details) so black screen. (i will remove this in next openstore release if my fix works.)
 * openstore disables OSK somehow? (need to release v0.4.6 to confirm fix until then it is here)
+
+important to mention the dynamic OSK currently only works on browser UI elements NOT webcontent, this is not a bug just lack of implementation.
 
 ### License
 
