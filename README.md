@@ -9,6 +9,8 @@ The setup process is straightforward:
  -  Stage 1: On your very first launch, uWolf will download necessary extensions. This takes a moment.
  -  Stage 2: After extensions are ready, a quick restart is needed. This loads the custom mobile UI to make things look right.
 
+ It is Important to note that every version update you are encouraged to clear startup cache here: about:support, if there are any problems.
+
 Youtube Short Demo: https://youtube.com/shorts/8IigTL3g1t8
 
 if the browser is too small or too big please send me the output of this:
