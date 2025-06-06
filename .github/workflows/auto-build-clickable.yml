@@ -251,26 +251,13 @@ jobs:
       - name: Build Click package for arm64 # TODO: add amd64 compiling
         if: ${{ steps.determine_build_info.outputs.run_clickable == 'true' }}
         run: clickable build --arch arm64 --skip-review
-      
-      - name: Build Click package for amd64
-        if: ${{ steps.determine_build_info.outputs.run_clickable == 'true' }}
-        run: clickable build --arch amd64 --skip-review
 
-      - name: Upload arm64 Click package artifacts (for workflow run)
+      - name: Upload Click package artifacts (for workflow run)
         if: ${{ steps.determine_build_info.outputs.run_clickable == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: click-packages-arm64-${{ steps.determine_build_info.outputs.new_uwolf_app_version_tag }}
           path: build/*/app/*.click
-          retention-days: 7
-      
-      - name: Upload amd64 Click package artifacts (for workflow run)
-        if: ${{ steps.determine_build_info.outputs.run_clickable == 'true' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: click-packages-amd64-${{ steps.determine_build_info.outputs.new_uwolf_app_version_tag }}
-          path: build/*/app/*.click
-          if-no-files-found: error
           retention-days: 7
 
       - name: Create Alpha Release
