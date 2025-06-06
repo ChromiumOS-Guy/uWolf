@@ -21,7 +21,8 @@ if the browser is too small or too big please send me the output of this:
 * Buggy suggestion/autofill menu on searchbar
 * OSK hides webcontent (this will only happen on webcontent not UI like searchbar)
 * On some devices OSK theme changes based on browser theme. (some mitigation added)
-* opening browser for first time through openstore causes it to launch with wayland support (see bug 2 for details) so black screen. (i will remove this in next openstore release if my fix works.)
+* opening browser for first time through openstore causes it to launch with wayland support (see bug 1 for details) so black screen. (i will remove this in next openstore release if my fix works.)
+* openstore disables OSK somehow?
 
 ### License
 
