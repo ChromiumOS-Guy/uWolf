@@ -1,3 +1,10 @@
+/* ==UserScript==
+// @name           agent style sheet
+// @description    declutter searchbar and make it more mobile friendly
+// @stylemode      agent_sheet
+// ==/UserScript==
+*/
+
 /*
  * declutter-searchbar.css
  * This file contains styles specifically for positioning and styling the URL/search bar at the top,

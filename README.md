@@ -1,10 +1,25 @@
 # uWolf
 
 A UT LibreWolf Wrapper for LibreWolf Firefox Based Browser.
-switch between desktop/mobile mode by enabling/disabiling resistgfingerprinting (or install and extension to switch useragents)
+this is still in early development, help welcome!
+
+It's important to note that without full hardware acceleration, performance isn't stellar, but it's generally good enough for basic Browse without heavy demands.
+
+The setup process is straightforward:
+ -  Stage 1: On your very first launch, uWolf will download necessary extensions. This takes a moment.
+ -  Stage 2: After extensions are ready, a quick restart is needed. This loads the custom mobile UI to make things look right.
+
+Youtube Short Demo: https://youtube.com/shorts/8IigTL3g1t8
 
 if the browser is too small or too big please send me the output of this:
 ```echo $GRID_UNIT_PX```  with device name as issue 
+
+## know Issues
+* No hardware acceleration (coming with mir2.x on Noble)
+* Buggy suggestion/autofill menu on searchbar
+* OSK hides webcontent (this will only happen on webcontent not UI like searchbar)
+* On some devices OSK theme changes based on browser theme. (some mitigation added)
+* opening browser for first time through openstore causes it to launch with wayland support (see bug 2 for details) so black screen. (i will remove this in next openstore release if my fix works.)
 
 ### License
 

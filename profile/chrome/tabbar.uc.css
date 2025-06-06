@@ -1,3 +1,10 @@
+/* ==UserScript==
+// @name           agent style sheet
+// @description    move tab bar to the bottom of the screen and modify margins for mobile friendliness.
+// @stylemode      agent_sheet
+// ==/UserScript==
+*/
+
 /* Source file: bottom-tabbar.css */
 
 /* Moves tabs to the bottom of the window */

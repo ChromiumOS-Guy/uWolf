@@ -1,0 +1,133 @@
+/* ==UserStyle== */
+/* @name          OSK Stylesheet (Reserved Space Only) */
+/* @description   OSK dynamic viewport adjustment */
+/* @stylemode     agent_sheet */
+/* @include       * */
+/* ==/UserStyle== */
+
+/* OSK-react.css */
+/* This file imports system-parameters.css. */
+/* It's designed to be imported into your main userChrome.css. */
+
+@import "system-parameters.css";
+
+:root {
+  /* Set position for the pseudo-element (no longer used, but keeping for compatibility) */
+  position: relative;
+
+  /* Dynamically select the active portrait height based on --is-tablet. */
+  --calculated-osk-height-portrait: calc(
+    var(--calculated-o-s-kphone-portrait-height) * (1 - var(--is-tablet)) +
+    var(--calculated-o-s-ktablet-portrait-height) * var(--is-tablet)
+  );
+
+  /* Dynamically select the active landscape height based on --is-tablet. */
+  --calculated-osk-height-landscape: calc(
+    var(--calculated-o-s-kphone-landscape-height) * (1 - var(--is-tablet)) +
+    var(--calculated-o-s-ktablet-landscape-height) * var(--is-tablet)
+  );
+
+  /* Define variables for the scaled OSK height */
+  --active-portrait-o-s-k-height-scaled: calc(var(--calculated-osk-height-portrait) * (1 / var(--scaling)) - 52px); /* the -52px is to accomdate the tab bar on the bottom*/
+  --active-landscape-o-s-k-height-scaled: calc(var(--calculated-osk-height-landscape) * (1 / var(--scaling)) - 52px);
+
+  /* Apply a general transition to the root element for smoother changes */
+  transition: all 0.2s ease-out !important;
+}
+
+/*
+ * This section aims to reduce the *effective height* of the main browser content area
+ * to make space for the OSK, effectively "pushing" it up.
+ *
+ * We target key elements that typically control the overall vertical layout.
+ */
+
+/* Default state: ensure full height and flexibility when OSK is NOT focused */
+#main-window,
+#browser,
+#appcontent,
+#tab-browser,
+browser[type="content"],
+#content,
+.browserStack
+{
+  height: 100% !important;
+  max-height: 100% !important;
+  flex: 1 1 auto !important; /* Allow element to grow and shrink flexibly */
+  overflow: auto !important; /* Allow scrolling within the content area if it exceeds height */
+  margin-bottom: 0 !important; /* Ensure no residual margin */
+  box-sizing: border-box !important; /* Include padding and border in element's total width and height */
+  background-color: transparent !important; /* Ensure it's not itself a gray box */
+}
+
+/* When OSK is focused, add a bottom margin to push content up, creating reserved space */
+:root.osk-input-focused #main-window,
+:root.osk-input-focused #browser,
+:root.osk-input-focused #appcontent,
+:root.osk-input-focused #tab-browser,
+:root.osk-input-focused browser[type="content"],
+:root.osk-input-focused #content,
+:root.osk-input-focused .browserStack
+{
+  /* Use margin-bottom to create the reserved space for the OSK.
+     This pushes the content up and leaves a clear area at the bottom. */
+  margin-bottom: var(--active-portrait-o-s-k-height-scaled) !important;
+  /* Keep height/max-height/flex to 100% / auto so content can take up available space
+     and scroll if necessary within that space. */
+  height: 100% !important;
+  max-height: 100% !important;
+  flex: 1 1 auto !important;
+  overflow: auto !important; /* Ensure content can scroll within the adjusted area */
+}
+
+/* When OSK is hidden, explicitly ensure no bottom margin */
+:root.osk-hidden #main-window,
+:root.osk-hidden #browser,
+:root.osk-hidden #appcontent,
+:root.osk-hidden #tab-browser,
+:root.osk-hidden browser[type="content"],
+:root.osk-hidden #content,
+:root.osk-hidden .browserStack
+{
+  margin-bottom: 0 !important; /* Reset margin when hidden */
+  height: 100% !important;
+  max-height: 100% !important;
+  flex: 1 1 auto !important;
+  overflow: auto !important;
+}
+
+/* Adjust for landscape orientation */
+@media (orientation: landscape) {
+  :root.osk-input-focused #main-window,
+  :root.osk-input-focused #browser,
+  :root.osk-input-focused #appcontent,
+  :root.osk-input-focused #tab-browser,
+  :root.osk-input-focused browser[type="content"],
+  :root.osk-input-focused #content,
+  :root.osk-input-focused .browserStack
+  {
+    margin-bottom: var(--active-landscape-o-s-k-height-scaled) !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    flex: 1 1 auto !important;
+    overflow: auto !important;
+  }
+
+  :root.osk-hidden #main-window,
+  :root.osk-hidden #browser,
+  :root.osk-hidden #appcontent,
+  :root.osk-hidden #tab-browser,
+  :root.osk-hidden browser[type="content"],
+  :root.osk-hidden #content,
+  :root.osk-hidden .browserStack
+  {
+    margin-bottom: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    flex: 1 1 auto !important;
+    overflow: auto !important;
+  }
+}
+
+/* --- REMOVED ALL STYLES FOR :root::after TO ELIMINATE THE VISUAL RECTANGLE --- */
+/* The reserved space is now solely created by the margin-bottom on the main content. */

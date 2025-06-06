@@ -1,10 +1,7 @@
 {
     "policy_groups": [
         "audio",
-        "calendar",
         "networking",
-        "location",
-        "content_exchange",
         "keep-display-on"
     ],
     "policy_version": 20.04,

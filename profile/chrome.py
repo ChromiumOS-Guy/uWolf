@@ -1,9 +1,92 @@
 import os
 import shutil
 import filecmp # For comparing file contents
+from .keyboard import get_OSK_data # must be relative
+
+
+#### START CHROME INIT ####
+
+def INIT_CHROME(profile_info : list, system_var_dict : dict):
+    if not profile_info or not profile_info[0]:
+        print("Could not find a valid profile path. Probably first start or an error occurred.")
+        return
+
+    profile_path, profile_name = profile_info[0], profile_info[1]
+
+    print(f"Attempting to synchronize/generate custom 'chrome' files for profile: {profile_name}")
+
+    if not os.path.exists(profile_path):
+        print(f"Error: Profile path does not exist! ({profile_path})")
+        return
+
+    destination_chrome_root = os.path.join(profile_path, "chrome")
+
+    copy_custom_chrome_files(destination_chrome_root) # copy chrome .css files
+
+    generate_css_variables(destination_chrome_root, system_var_dict) ## generate css keyboard files
+
+#### END CHROME INIT ####
+
+#### START GENERATE KEYBOARD PARAMETERS ####
+
+def generate_css_variables(destination_chrome_root, system_var_dict,  data_dict: dict = get_OSK_data(), filename="system-parameters"):
+    """
+    Generates a CSS file with variables from a Python dictionary.
+
+    Args:
+        data_dict (dict): The dictionary containing your values.
+        filename (str): The name of the CSS file to create.
+    """
+
+    # For testing purposes, you can uncomment this:
+    #data_dict = {
+    #    'calculatedPortraitOSKHeight': 640.00,
+    #    'calculatedLandscapeOSKHeight': 352.80
+    #}
+
+    # Construct the full path to the file
+    full_filepath = os.path.join(destination_chrome_root, "CSS" , filename + ".css")
+
+    # Extract the directory path from the full file path
+    file_directory = os.path.dirname(full_filepath)
+
+    # Add header comment
+    css_content = f"""/* {filename}.css */
+/* This file defines CSS variables for custom UI to use (AUTO GENERATED). */\n""".format(filename=filename)
+    # Now, attempt to create/write the file
+    css_content += "\n:root {\n"
+
+    #### Keyboard (OSK)
+    for key, value in data_dict.items():
+        # Convert camelCase to kebab-case for CSS variable names
+        css_key = ''.join(['-' + c.lower() if c.isupper() else c for c in key]).lstrip('-')
+
+        # Add 'px' or other units if appropriate.
+        # You might need more sophisticated logic here if units vary.
+        if isinstance(value, (int, float)):
+            css_content += f"  --{css_key}: {value}px;\n"
+        else:
+            css_content += f"  --{css_key}: {value};\n"
+    
+    #### ENV VARIABLES (no fromating for full control)
+    for key, value in system_var_dict.items():
+        # Convert camelCase to kebab-case for CSS variable names
+        css_key = ''.join(['-' + c.lower() if c.isupper() else c for c in key]).lstrip('-')
+        css_content += f"  --{css_key}: {value};\n"
+
+    css_content += "}\n"
+
+    try:
+        with open(full_filepath, "w") as f:
+            f.write(css_content)
+        print(f"CSS variables saved to {full_filepath}")
+    except OSError as e:
+        print(f"Error writing to file '{full_filepath}': {e}")
+
+#### END GENERATE KEYBOARD PARAMETERS ####
 
 #### START CUSTOM PROFILE CREATION ####
-def copy_custom_chrome_files(profile_info):
+def copy_custom_chrome_files(destination_chrome_root):
     """
     Copies files from the script's 'chrome/' directory to the specified
     Librewolf profile's 'chrome/' directory. Only copies files that are new
@@ -13,22 +96,11 @@ def copy_custom_chrome_files(profile_info):
         profile_info (tuple): A tuple containing (profile_full_path, profile_name).
                               (e.g., ('/home/user/.librewolf/xxxxxxxx.default', 'default'))
     """
-    if not profile_info or not profile_info[0]:
-        print("Could not find a valid profile path. Probably first start or an error occurred.")
-        return
-
-    profile_path, profile_name = profile_info[0], profile_info[1]
-
-    print(f"Attempting to synchronize custom 'chrome' files for profile: {profile_name}")
-
-    if not os.path.exists(profile_path):
-        print(f"Error: Profile path does not exist! ({profile_path})")
-        return
+    
 
     # Define paths
     script_dir = os.path.dirname(os.path.abspath(__file__))
     source_chrome_dir = os.path.join(script_dir, "chrome")
-    destination_chrome_root = os.path.join(profile_path, "chrome")
 
     # 1. Check if the source 'chrome' directory exists
     if not os.path.exists(source_chrome_dir):
@@ -102,6 +174,33 @@ def copy_custom_chrome_files(profile_info):
                     print(f"Copied: {source_file_path} to {destination_file_path}")
                 except Exception as e:
                     print(f"Error copying file {source_file_path} to {destination_file_path}: {e}")
+        
+        for dirpath, dirnames, filenames in os.walk(destination_chrome_root, topdown=False): # topdown=False for deleting subdirs first
+            rel_path = os.path.relpath(dirpath, destination_chrome_root)
+            current_source_dir = os.path.join(source_chrome_dir, rel_path)
 
+            # Delete extraneous files
+            for filename in filenames:
+                destination_file_path = os.path.join(dirpath, filename)
+                source_file_path = os.path.join(current_source_dir, filename)
+
+                if not os.path.exists(source_file_path):
+                    print(f"Deleting extraneous file: {destination_file_path}")
+                    try:
+                        os.remove(destination_file_path)
+                    except OSError as e:
+                        print(f"Error deleting file {destination_file_path}: {e}")
+
+            # Delete extraneous directories (only if empty after file deletions, or if not in source)
+            if dirpath != destination_chrome_root: # Don't delete the root destination_chrome_root itself
+                if not os.path.exists(current_source_dir):
+                    if not os.listdir(dirpath): # Check if directory is empty
+                        print(f"Deleting extraneous empty directory: {dirpath}")
+                        try:
+                            os.rmdir(dirpath)
+                        except OSError as e:
+                            print(f"Error deleting empty directory {dirpath}: {e}")
+                    else:
+                        pass # Leave non-empty extraneous directories if they weren't in source
 
 #### END CUSTOM PROFILE CREATION ####
