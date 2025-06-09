@@ -21,8 +21,7 @@ if the browser is too small or too big please send me the output of this:
 * Buggy suggestion/autofill menu on searchbar
 * OSK hides webcontent (this will only happen on webcontent not UI like searchbar, hiding tabbar is a actually a feature so it doesn't count)
 * On some devices OSK theme changes based on browser theme. (some mitigation added)
-* opening browser for first time through openstore causes it to launch with wayland support (see bug 1 for details) so black screen. (i will remove this in next openstore release if my fix works.)
-* openstore disables OSK somehow? (need to release v0.4.6 to confirm fix until then it is here)
+* opening app from openstore forces uwolf to open through wayland which results in a black screen (see bug 1 for details)
 
 important to mention the dynamic OSK currently only works on browser UI elements NOT webcontent, this is not a bug just lack of implementation.
 
