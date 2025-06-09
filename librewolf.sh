@@ -50,6 +50,9 @@ os.environ["GDK_DPI_SCALE"]=scaling
 os.environ["GTK_IM_MODULE"] = "Maliit"
 os.environ["GTK_IM_MODULE_FILE"] = "lib/@CLICK_ARCH@/gtk-3.0/3.0.0/immodules/immodules.cache"
 
+# Explicitly force X11 backend for GTK applications like LibreWolf (will remove when mir2.x comes out)
+os.environ["GDK_BACKEND"] = "x11" 
+
 # Force Wayland
 # os.environ["MOZ_ENABLE_WAYLAND"] = "1"
 
