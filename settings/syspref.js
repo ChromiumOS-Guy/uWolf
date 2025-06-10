@@ -1,8 +1,8 @@
 // This file can be used to configure global preferences for Firefox
 
 // Example: Homepage
-pref("browser.urlbar.placeholderName", "DuckDuckGo");
-pref("browser.urlbar.placeholderName.private", "DuckDuckGo");
+pref("browser.urlbar.placeholderName", "SearXNG");
+pref("browser.urlbar.placeholderName.private", "SearXNG");
 pref("browser.startup.homepage", "ubports.com");
 pref("browser.uidensity", 2);
 pref("browser.shell.checkDefaultBrowser", false);

@@ -5,7 +5,7 @@
 /* @include       * */
 /* ==/UserStyle== */
 
-/* OSK-react.css */
+/* osk_style.uc.css */
 /* This file imports system-parameters.css. */
 /* It's designed to be imported into your main userChrome.css. */
 
@@ -28,8 +28,8 @@
   );
 
   /* Define variables for the scaled OSK height */
-  --active-portrait-o-s-k-height-scaled: calc(var(--calculated-osk-height-portrait) * (1 / var(--scaling)) - 52px); /* the -52px is to accomdate the tab bar on the bottom*/
-  --active-landscape-o-s-k-height-scaled: calc(var(--calculated-osk-height-landscape) * (1 / var(--scaling)) - 52px);
+  --active-portrait-o-s-k-height-scaled: calc(var(--calculated-osk-height-portrait) * (1 / var(--scaling)) - 67px); /* the -52px is to accomdate the tab bar on the bottom*/
+  --active-landscape-o-s-k-height-scaled: calc(var(--calculated-osk-height-landscape) * (1 / var(--scaling)) - 67px);
 
   /* Apply a general transition to the root element for smoother changes */
   transition: all 0.2s ease-out !important;
@@ -54,13 +54,14 @@ browser[type="content"],
   height: 100% !important;
   max-height: 100% !important;
   flex: 1 1 auto !important; /* Allow element to grow and shrink flexibly */
-  overflow: auto !important; /* Allow scrolling within the content area if it exceeds height */
+  overflow-y: auto !important; /* Allow vertical scrolling within the content area if it exceeds height */
   margin-bottom: 0 !important; /* Ensure no residual margin */
   box-sizing: border-box !important; /* Include padding and border in element's total width and height */
   background-color: transparent !important; /* Ensure it's not itself a gray box */
 }
 
 /* When OSK is focused, add a bottom margin to push content up, creating reserved space */
+/* And disable scrolling to prevent scrollbar smearing */
 :root.osk-input-focused #main-window,
 :root.osk-input-focused #browser,
 :root.osk-input-focused #appcontent,
@@ -72,12 +73,11 @@ browser[type="content"],
   /* Use margin-bottom to create the reserved space for the OSK.
      This pushes the content up and leaves a clear area at the bottom. */
   margin-bottom: var(--active-portrait-o-s-k-height-scaled) !important;
-  /* Keep height/max-height/flex to 100% / auto so content can take up available space
-     and scroll if necessary within that space. */
+  /* Keep height/max-height/flex to 100% / auto so content can take up available space */
   height: 100% !important;
   max-height: 100% !important;
   flex: 1 1 auto !important;
-  overflow: auto !important; /* Ensure content can scroll within the adjusted area */
+  overflow-y: hidden !important; /* Disable vertical scrolling when OSK is focused */
 }
 
 /* When OSK is hidden, explicitly ensure no bottom margin */
@@ -93,7 +93,7 @@ browser[type="content"],
   height: 100% !important;
   max-height: 100% !important;
   flex: 1 1 auto !important;
-  overflow: auto !important;
+  overflow-y: auto !important; /* Re-enable vertical scrolling when OSK is hidden */
 }
 
 /* Adjust for landscape orientation */
@@ -110,7 +110,7 @@ browser[type="content"],
     height: 100% !important;
     max-height: 100% !important;
     flex: 1 1 auto !important;
-    overflow: auto !important;
+    overflow-y: hidden !important; /* Disable vertical scrolling in landscape when OSK is focused */
   }
 
   :root.osk-hidden #main-window,
@@ -125,7 +125,7 @@ browser[type="content"],
     height: 100% !important;
     max-height: 100% !important;
     flex: 1 1 auto !important;
-    overflow: auto !important;
+    overflow-y: auto !important; /* Re-enable vertical scrolling in landscape when OSK is hidden */
   }
 }
 

@@ -17,14 +17,23 @@
   width: 100% !important;
   background-color: var(--lwt-accent-color, #f9f9fb) !important; /* Adjust background color as needed */
   border-top: 1px solid var(--lwt-accent-color, #ccc) !important; /* Add a top border */
-  /* Increased for a bit thicker feel and easier tapping */
-  min-height: 52px !important; /* Increased from 48px */
+  /* Ensure the tab bar itself has enough space.
+     We use a direct height to override any potential min/max height conflicts more strongly,
+     and add !important for maximum specificity.
+     Original 52px + 15px = 67px.
+  */
+  height: 67px !important;
+  min-height: 67px !important; /* Keep min-height for robustness */
+  max-height: 67px !important; /* Add max-height to ensure it doesn't grow too much */
 }
 
 /* Adjust the main browser content area to make space for the tabs at the bottom */
 #browser {
-  /* Increased margin to account for larger tab bar height */
-  margin-bottom: calc(var(--tab-min-height, 52px) + 1px) !important; /* Adjust based on new tab height + border */
+  /* Increased margin to account for larger tab bar height.
+     This calculation needs to be robust. Using the exact height from TabsToolbar.
+     Original 52px + 15px + 1px (border) = 68px.
+  */
+  margin-bottom: 68px !important;
 }
 
 /* Hide the default tab bar at the top if it's still visible or causing issues */
@@ -32,30 +41,45 @@
   padding-bottom: 0 !important;
 }
 
-/* Optional: Adjust the height of the tab bar if needed */
+/* Adjust the height of the individual tabs */
 #TabsToolbar .tabbrowser-tab {
-  /* Make individual tabs taller for easier tapping and a thicker feel */
-  min-height: var(--tab-min-height, 50px) !important; /* Increased from 46px */
-  max-height: var(--tab-min-height, 50px) !important; /* Ensure consistent height */
+  /* Make individual tabs taller for easier tapping and a thicker feel.
+     Original 50px + 15px = 65px.
+     Using both min-height and max-height with !important to ensure consistent sizing.
+  */
+  min-height: 65px !important;
+  max-height: 65px !important;
   /* Add more horizontal padding to make tabs wider and easier to tap */
-  padding-inline: 20px !important; /* Remains the same, focused on height for thickness */
+  padding-inline: 20px !important;
+  /* Align content vertically within the tab */
+  line-height: 65px !important; /* Helps center text vertically if it's not already */
 }
 
-/* Optional: Adjust the padding of the tab bar to make it look better at the bottom */
+/* Ensure the tab container itself can accommodate the taller tabs */
 #tabbrowser-tabs {
-  padding-left: 10px !important; /* Remains the same */
-  padding-right: 10px !important; /* Remains the same */
-  /* Increased space between tabs */
-  column-gap: 8px !important; /* Increased from 5px for more spacing */
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  column-gap: 8px !important;
+  /* Ensure this container can grow vertically if needed to fit tabs */
+  height: 100% !important; /* Make sure it takes available height of its parent */
+  min-height: 65px !important; /* Match tab height */
+  display: flex !important; /* Use flexbox to better control child alignment and spacing */
+  align-items: center !important; /* Vertically center the tabs within the tabbar-tabs container */
 }
 
 /* Optional: Adjust the new tab button position and size if it looks off */
 .tabs-newtab-button {
   margin-inline-end: 0px !important;
-  margin-inline-start: 10px !important; /* Remains the same */
-  /* Make the new tab button larger and easier to tap (consistent with tab height) */
-  min-width: 45px !important; /* Slightly increased */
-  min-height: 45px !important; /* Slightly increased */
+  margin-inline-start: 10px !important;
+  /* Make the new tab button larger and easier to tap (consistent with tab height).
+     Original 45px + 15px = 60px.
+  */
+  min-width: 60px !important;
+  min-height: 60px !important;
+  /* Also ensure it's centered if using flexbox */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
 }
 
 /* Ensure the window controls (minimize, maximize, close) are still accessible */
