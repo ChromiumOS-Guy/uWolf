@@ -30,8 +30,8 @@ if uWolf does not have any default search engines run this to agressivly set pre
 ``` shell
 cd ~/.librewolf
 sudo chown -R phablet:phablet *.default-default/
-find a5xdbzal.default-default/ -type d -exec chmod u+rwx {} +
-find a5xdbzal.default-default/ -type f -exec chmod u+rw {} + 
+find *.default-default/ -type d -exec chmod u+rwx {} +
+find *.default-default/ -type f -exec chmod u+rw {} + 
 ```
 
 ## TODO:
