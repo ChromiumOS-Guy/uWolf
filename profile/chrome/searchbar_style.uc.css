@@ -23,8 +23,9 @@
   border-bottom: 1px solid var(--lwt-toolbar-border-color, rgba(0,0,0,0.1)) !important;
   width: 100vw !important;
   margin: 0 !important;
-  min-height: unset !important;
-  height: auto !important;
+  height: 7vh !important;
+  min-height: 45px !important; /* Ensures the height is at least 45px */
+  max-height: 120px !important; /* Ensures the height does not exceed 120px */
   align-items: center !important; /* Vertically center items */
   /* NO custom justify-content or other flex ordering for urlbar */
 }
@@ -47,12 +48,47 @@
 
 /* Explicitly make the essential navigation buttons visible */
 #back-button,
-#forward-button,
-#reload-button,
-#stop-button {
+#forward-button {
   visibility: visible !important;
   display: flex !important;
 }
+
+/* --- REVISED MODIFICATION START --- */
+/*
+  The goal is to ensure only one of these is ever visible.
+  Firefox's default behavior is to apply 'display: none'
+  via the 'hidden' attribute. If that's not working,
+  we force it.
+*/
+
+/* Always ensure stop-button is hidden if reload-button is *not* hidden */
+#reload-button:not([hidden]) + #stop-button {
+  display: none !important;
+  visibility: collapse !important;
+}
+
+/* Always ensure reload-button is hidden if stop-button is *not* hidden */
+#stop-button:not([hidden]) + #reload-button {
+  display: none !important;
+  visibility: collapse !important;
+}
+
+/* Fallback: Ensure they are hidden by default if the hidden attribute is problematic */
+/* This might be redundant if the above works, but provides extra force */
+#stop-button[hidden],
+#reload-button[hidden] {
+  display: none !important;
+  visibility: collapse !important;
+}
+
+/* Ensure they are visible when they are supposed to be */
+#reload-button:not([hidden]),
+#stop-button:not([hidden]) {
+  visibility: visible !important;
+  display: flex !important; /* or 'block' if needed, but flex is common for toolbar items */
+}
+/* --- REVISED MODIFICATION END --- */
+
 
 /* Hide the Home button */
 #home-button {

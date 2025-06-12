@@ -1,0 +1,3 @@
+defaultPref("webgl.disabled", false);
+defaultPref("privacy.resistFingerprinting", true);
+defaultPref("network.http.referer.XOriginPolicy", 2);

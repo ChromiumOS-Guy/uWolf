@@ -4,7 +4,7 @@ import filecmp # Make sure filecmp is imported if not already
 
 # (Keep your existing copy_custom_chrome_files function here as is)
 
-def copy_librewolf_overrides_cfg(profile_info):
+def copy_librewolf_overrides_cfg(profile_info, staged: bool = True):
     """
     Copies 'librewolf.overrides.cfg' from the script's 'profile/' directory
     to the ~/.librewolf/ directory (parent of the specific profile).
@@ -30,7 +30,10 @@ def copy_librewolf_overrides_cfg(profile_info):
 
     # Define source and destination paths for librewolf.overrides.cfg
     script_dir = os.path.dirname(os.path.abspath(__file__)) # Get the directory of the current script
-    source_overrides_cfg = os.path.join(script_dir,  "librewolf.overrides.cfg")
+    if staged:
+        source_overrides_cfg = os.path.join(script_dir,  "librewolf.overrides.cfg")
+    else:
+        source_overrides_cfg = os.path.join(script_dir,  "librewolf.overrides.cfg.notstaged")
     destination_overrides_cfg = os.path.join(destination_dir, "librewolf.overrides.cfg")
 
     # 1. Check if the source librewolf.overrides.cfg exists

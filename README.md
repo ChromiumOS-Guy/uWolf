@@ -15,7 +15,8 @@ It is Important to note that every version update you are encouraged to clear st
 Youtube Short Demo: https://youtube.com/shorts/8IigTL3g1t8
 
 if the browser is too small or too big please send me the output of this:
-```echo $GRID_UNIT_PX```  with device name as issue 
+```echo $GRID_UNIT_PX```  with device name as issue ```getprop ro.product.name```, you are encouraged to provide more details about device
+
 
 ## know Issues
 * No hardware acceleration (fix coming with mir2.x on Noble)
@@ -24,6 +25,14 @@ if the browser is too small or too big please send me the output of this:
 * OSK hides webcontent (this will only happen on webcontent not UI like searchbar, hiding tabbar is a actually a feature so it doesn't count)
 * On some devices OSK theme changes based on browser theme. (some mitigation added)
 * On second launch crashes, after that everything is fine.
+
+if uWolf does not have search engines any default run this to agressivly set premissions 
+``` shell
+cd ~/.librewolf
+sudo chown -R phablet:phablet a5xdbzal.default-default/
+find a5xdbzal.default-default/ -type d -exec chmod u+rwx {} +
+find a5xdbzal.default-default/ -type f -exec chmod u+rw {} + 
+```
 
 ## TODO:
 * implement OSK dynamic reactions into webcontent. (will also get rid of bug 4)

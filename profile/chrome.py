@@ -34,6 +34,8 @@ def generate_css_variables(destination_chrome_root, system_var_dict,  data_dict:
     Generates a CSS file with variables from a Python dictionary.
 
     Args:
+        destination_chrome_root (path): path to chrome.
+        system_var_dict (dict): has info about screen type/scaling amount.
         data_dict (dict): The dictionary containing your values.
         filename (str): The name of the CSS file to create.
     """
@@ -93,8 +95,7 @@ def copy_custom_chrome_files(destination_chrome_root):
     or have changed content. It also creates necessary subdirectories.
 
     Args:
-        profile_info (tuple): A tuple containing (profile_full_path, profile_name).
-                              (e.g., ('/home/user/.librewolf/xxxxxxxx.default', 'default'))
+        destination_chrome_root (path): a path to profile/chrome.
     """
     
 
@@ -204,3 +205,36 @@ def copy_custom_chrome_files(destination_chrome_root):
                         pass # Leave non-empty extraneous directories if they weren't in source
 
 #### END CUSTOM PROFILE CREATION ####
+
+#### START DELETE CHROME ####
+
+def delete(profile_info):
+    """
+    deletes profile/chrome for the specifed librewolf profile
+
+    Args:
+        profile_info (tuple): A tuple containing (profile_full_path, profile_name).
+                              (e.g., ('/home/user/.librewolf/xxxxxxxx.default', 'default'))
+    """
+    
+    if not profile_info or not profile_info[0]:
+        print("Could not find a valid profile path. Probably first start or an error occurred.")
+        return
+
+    profile_path, profile_name = profile_info[0], profile_info[1]
+
+    print(f"Attempting to delete custom 'chrome' files for profile: {profile_name}")
+
+    # Define paths
+    destination_chrome_root = os.path.join(profile_path, "chrome")
+
+    # Ensure the root destination 'chrome' directory exists
+    if not os.path.exists(destination_chrome_root):
+        print(f"Error destination 'chrome' root directory does not exist, nothing to do.")
+    
+    try:
+        os.rmdir(destination_chrome_root)
+    except OSError as e:
+        print(f"Error deleting root 'chrome' directory {destination_chrome_root}: {e}")
+
+#### END DELETE CHROME ####

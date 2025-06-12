@@ -22,9 +22,9 @@
      and add !important for maximum specificity.
      Original 52px + 15px = 67px.
   */
-  height: 67px !important;
-  min-height: 67px !important; /* Keep min-height for robustness */
-  max-height: 67px !important; /* Add max-height to ensure it doesn't grow too much */
+  height: 7vh !important;
+  min-height: 45px !important; /* Keep min-height for robustness */
+  max-height: 120px !important; /* Add max-height to ensure it doesn't grow too much */
 }
 
 /* Adjust the main browser content area to make space for the tabs at the bottom */
