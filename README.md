@@ -15,7 +15,7 @@ It is Important to note that every version update you are encouraged to clear st
 Youtube Short Demo: https://youtube.com/shorts/8IigTL3g1t8
 
 if the browser is too small or too big please send me the output of this:
-```echo $GRID_UNIT_PX```  with device name as issue ```getprop ro.product.name```, you are encouraged to provide more details about device
+```echo $GRID_UNIT_PX```  with device name as issue ```getprop ro.product.name```, you are encouraged to provide more details about device.
 
 
 ## know Issues
@@ -26,10 +26,10 @@ if the browser is too small or too big please send me the output of this:
 * On some devices OSK theme changes based on browser theme. (some mitigation added)
 * On second launch crashes, after that everything is fine.
 
-if uWolf does not have search engines any default run this to agressivly set premissions 
+if uWolf does not have any default search engines run this to agressivly set premissions.
 ``` shell
 cd ~/.librewolf
-sudo chown -R phablet:phablet a5xdbzal.default-default/
+sudo chown -R phablet:phablet *.default-default/
 find a5xdbzal.default-default/ -type d -exec chmod u+rwx {} +
 find a5xdbzal.default-default/ -type f -exec chmod u+rw {} + 
 ```
