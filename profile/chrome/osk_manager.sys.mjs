@@ -1,12 +1,15 @@
 // ==UserScript==
-// @name           OSK Manager (Command Driven)
-// @description    Manages OSK overlay visibility based on commands from UI and web content scripts.
+// @name OSK Manager (Config Driven)
+// @description Manages OSK overlay visibility based on commands from the trigger script.
 // @onlyonce
 // ==/UserScript==
 
 import { Windows } from "chrome://userchromejs/content/uc_api.sys.mjs";
 
-const DEBUG_MODE = true; // Set to true to see console logs
+const CONFIG_FILE_URL = "chrome://userscripts/content/osk_overlay_config.js";
+const DEBUG_MODE = true;
+const CUSTOM_EVENT_READ_CONFIG = "OSK_READ_CONFIG_COMMAND";
+const CUSTOM_EVENT_HIDE_OSK = "OSK_HIDE_COMMAND";
 
 function log(...args) {
   if (DEBUG_MODE) {
@@ -16,17 +19,12 @@ function log(...args) {
 
 log("OSK Manager Script: Initializing.");
 
-// Internal flags to track focus state from different sources
-let browserUIInputHasFocus = false;
-let webContentInputHasFocus = false;
-
-// The current global state of the OSK overlay
 let currentOSKOverlayState = false; // false = hidden, true = shown
+let lastConfigFileCharCount = -1; // Initialize with -1 to ensure first read triggers a show
 
 /**
  * Updates the actual OSK overlay visibility across all browser windows.
  * This is the ONLY function that directly manipulates the CSS classes.
- * It's called internally by `determineAndSetOSKState`.
  * @param {boolean} show - True to show, false to hide the overlay.
  */
 function setOSKOverlayState(show) {
@@ -53,67 +51,51 @@ function setOSKOverlayState(show) {
 }
 
 /**
- * Determines the overall desired OSK state based on current focus flags
- * and then calls setOSKOverlayState to apply it.
- * This function acts as the "request processor".
+ * Reads the content of the configuration file, compares character count,
+ * and updates the OSK state if the count has changed.
  */
-function determineAndSetOSKState() {
-  const desiredState = browserUIInputHasFocus || webContentInputHasFocus;
-  log("Determining OSK state: UI Focused:", browserUIInputHasFocus, "| Web Focused:", webContentInputHasFocus, "-> Desired:", desiredState ? "SHOW" : "HIDE");
-  setOSKOverlayState(desiredState);
+async function readAndApplyConfigState() {
+  try {
+    const response = await fetch(CONFIG_FILE_URL);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch config file: ${response.statusText}`);
+    }
+    const configContent = await response.text();
+    const currentCharCount = configContent.length;
+
+    if (currentCharCount !== lastConfigFileCharCount) {
+      log("Character count has changed. Showing OSK.");
+      setOSKOverlayState(true);
+      lastConfigFileCharCount = currentCharCount; // Save the new character count
+    } else {
+      log("Character count is the same. OSK state unchanged by file read.");
+    }
+  } catch (error) {
+    console.error("[OSK Manager] Error reading config file:", error);
+    // On error, we don't change the OSK state based on the file read.
+  }
 }
 
-
 /**
- * Handles messages received from osk_controller.uc.js (browser UI)
- * and osk_web_input_detector.uc.js (web content).
+ * Handles messages received from osk_config_trigger.uc.mjs.
  * @param {MessageEvent} event - The message event.
  */
-function handleFocusMessage(event) {
-  // Enhanced logging for incoming messages
-  log("Message received by Manager:");
-  log("  Type:", event.data ? event.data.type : 'N/A');
-  log("  Data:", event.data);
-  log("  Origin:", event.origin); // The origin of the message sender (e.g., "https://www.google.com")
-  log("  Source Window URL:", event.source ? (event.source.location ? event.source.location.href : 'N/A (no location)') : 'N/A (no source)');
-  log("  Target Window URL (this window):", event.target ? (event.target.location ? event.target.location.href : 'N/A (no location)') : 'N/A (no target)');
-
+function handleCommandMessage(event) {
+  log("Message received by Manager, Data: ", event.data);
 
   if (!event.data || !event.data.type) {
     return; // Ignore irrelevant messages
   }
 
-  switch (event.data.type) {
-    case 'OSK_UI_FocusIn':
-      if (!browserUIInputHasFocus) {
-        browserUIInputHasFocus = true;
-        determineAndSetOSKState();
-      }
-      break;
-    case 'OSK_UI_FocusOut':
-      if (browserUIInputHasFocus) {
-        browserUIInputHasFocus = false;
-        determineAndSetOSKState();
-      }
-      break;
-    case 'OSK_Web_FocusIn':
-      if (!webContentInputHasFocus) {
-        webContentInputHasFocus = true;
-        determineAndSetOSKState();
-      }
-      break;
-    case 'OSK_Web_FocusOut':
-      if (webContentInputHasFocus) {
-        webContentInputHasFocus = false;
-        determineAndSetOSKState();
-      }
-      break;
-    default:
-      log("Unknown message type:", event.data.type);
-      break;
+  if (event.data.type === CUSTOM_EVENT_READ_CONFIG) {
+    readAndApplyConfigState();
+  } else if (event.data.type === CUSTOM_EVENT_HIDE_OSK) {
+    log("Explicit HIDE command received from trigger. Hiding OSK.");
+    setOSKOverlayState(false);
+  } else {
+    log("Unknown or unhandled message type:", event.data.type);
   }
 }
-
 
 // Register the main handler for newly created browser windows.
 Windows.onCreated(async (win) => {
@@ -124,17 +106,9 @@ Windows.onCreated(async (win) => {
 
   log("New browser window detected:", win.location.href);
 
-  // Wait for the window to be fully initialized before attaching listeners.
   await Windows.waitWindowLoading(win);
 
-  // Add a listener to this browser window to receive messages from its content (tabs)
-  // AND from its own UI scripts (like osk_controller.uc.js).
-  // The 'message' event on a chrome window receives messages posted from content
-  // windows (tabs/iframes) within that chrome window.
-  win.addEventListener('message', handleFocusMessage, false);
-
-  // Ensure initial OSK state for this newly loaded window.
-  determineAndSetOSKState();
+  win.addEventListener('message', handleCommandMessage, false);
 
   log("OSK Manager: Message listener added for window:", win.location.href);
 });
@@ -143,9 +117,12 @@ Windows.onCreated(async (win) => {
 Windows.forEach((doc, win) => {
   if (Windows.isBrowserWindow(win)) {
     log("Initializing already open browser window:", win.location.href);
-    // Directly call the onCreated callback with the existing window.
     Windows.onCreated._callbacks.forEach(cb => cb(win));
   }
-}, true); // `true` ensures we only iterate over browser windows.
+}, true);
 
-log("OSK Manager Script: Initialization complete. Listening for focus commands.");
+log("OSK Manager Script: Initialization complete. Waiting for commands.");
+
+// Perform an initial read when the manager script itself initializes,
+// to set the initial state based on the daemon's file.
+readAndApplyConfigState();

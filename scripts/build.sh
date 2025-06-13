@@ -58,6 +58,9 @@ else
   echo "Successfully downloaded librewolf binaries!" >> $LOG_FILE
 fi
 
+# make sure there is no permission problem for librewolf
+/bin/chmod -R +x $INSTALL_DIR/bin/* 
+
 # fx-autoconfig script downloader
 echo "--->running fx-autoconfig download script" >> $LOG_FILE
 if ! $BUILD_DIR/scripts/fx-autoconfig-d.sh >> $LOG_FILE; then # move app files to build

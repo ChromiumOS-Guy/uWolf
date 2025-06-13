@@ -29,7 +29,7 @@
 
   /* Define variables for the scaled OSK height */
   --active-portrait-o-s-k-height-scaled: calc(var(--calculated-osk-height-portrait) * (1 / var(--scaling)) - max(45px, min(7vh, 120px))); /* the -52px is to accomdate the tab bar on the bottom*/
-  --active-landscape-o-s-k-height-scaled: calc(var(--calculated-osk-landscape-height) * (1 / var(--scaling)) - max(45px, min(7vh, 120px)));
+  --active-landscape-o-s-k-height-scaled: calc(var(--calculated-osk-height-landscape) * (1 / var(--scaling)) - max(45px, min(7vh, 120px)));
 
   /* Apply a general transition to the root element for smoother changes */
   transition: all 0.2s ease-out !important;
@@ -131,33 +131,3 @@ browser[type="content"],
 
 /* --- REMOVED ALL STYLES FOR :root::after TO ELIMINATE THE VISUAL RECTANGLE --- */
 /* The reserved space is now solely created by the margin-bottom on the main content. */
-
-/* --- Overlay for the entire screen when OSK is focused --- */
-:root.osk-input-focused::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.3); /* Slightly gray tint, adjust alpha for intensity */
-  z-index: 9999; /* Ensure it's above other content but below the OSK itself if it's a separate element */
-  /* pointer-events: auto;  <-- This is the default, so you can just remove 'pointer-events: none;' */
-  transition: opacity 0.2s ease-out !important; /* Smooth transition for the overlay */
-  opacity: 1;
-}
-
-/* Hide the overlay when OSK is not focused or is hidden */
-:root:not(.osk-input-focused)::before {
-  content: ""; /* Still needed to allow transitions, but can be empty */
-  position: fixed; /* Keep it fixed */
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: transparent; /* Make it transparent */
-  z-index: -1; /* Send it behind everything when not active */
-  pointer-events: none; /* Make it pass-through when hidden/inactive */
-  transition: opacity 0.2s ease-out !important;
-  opacity: 0;
-}

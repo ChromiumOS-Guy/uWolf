@@ -8,7 +8,6 @@ It's important to note that without full hardware acceleration, performance isn'
 The setup process is straightforward:
  -  Stage 1: On your very first launch, uWolf will download necessary extensions. This takes a moment.
  -  Stage 2: After extensions are ready, a quick restart is needed. This loads the custom mobile UI to make things look right.
- -  Stage 3: Then you need to launch again (it's not a bug it's a feature)
 
 It is Important to note that every version update you are encouraged to clear startup cache here: about:support, if there are any problems.
 
@@ -18,13 +17,17 @@ if the browser is too small or too big please send me the output of this:
 ```echo $GRID_UNIT_PX```  with device name as issue ```getprop ro.product.name```, you are encouraged to provide more details about device.
 
 
+## I'm hunting for this:
+the monitor can only tell me when the OSK focuses IN it can't tell me if it focuses OUT, if you can find the dbus call for that or an alternative sulotion to integrate into dbus monitor service I'd be grateful.
+as current focus OUT detection is crappy at best.
+
+
 ## know Issues
 * No hardware acceleration (fix coming with mir2.x on Noble)
 * Opening uwolf from openstore crashes uwolf. (fix coming with mir2.x on Noble)
 * Seperate Clipboard (copy/paste) then rest of system (fix coming with mir2.x on Noble)
-* OSK hides webcontent (this will only happen on webcontent not UI like searchbar, hiding tabbar is a actually a feature so it doesn't count)
-* On some devices OSK theme changes based on browser theme. (some mitigation added)
-* On second launch crashes, after that everything is fine.
+* For some reason there are no default search engines there are no consistant patterns for why this happens.
+* After writing file to chrome librewolf crashes.
 
 if uWolf does not have any default search engines run this to agressivly set premissions.
 ``` shell
@@ -35,7 +38,7 @@ find *.default-default/ -type f -exec chmod u+rw {} +
 ```
 
 ## TODO:
-* implement OSK dynamic reactions into webcontent. (will also get rid of bug 4)
+* fix bug 4 as you cannot properly use the browser with it being in effect.
 * implement url_dispatcher for link opening functionality (requiers fixing bug 2)
 
 

@@ -17,8 +17,10 @@
 import os
 import sys
 import yaml
+import re
 import subprocess
 from profile import profile, chrome, librewolf_overrides
+import focus_monitor
 
 
 #### Functions
@@ -31,18 +33,65 @@ def scalingdevidor(GRID_PX : int = int(os.environ["GRID_UNIT_PX"])) -> int:
     return 10
 
 def is_tablet() -> int:
+  process = None
   try:
-      with open("/etc/deviceinfo/devices/halium.yaml", 'r') as file:
-        yaml_data = yaml.safe_load(file) # pull deviceinfo
-        for device, info in yaml_data.items():
-          if info.get("DeviceType") != 'phone': # check if its a phone or not
-            return 1 # tablet
+    yaml_path = "/etc/deviceinfo/devices/halium.yaml" # will be use as fallback if device is not native device.
+    process = subprocess.Popen(
+        "getprop ro.product.name",
+        stdout=subprocess.PIPE,
+        text=True,  # Decode output as text
+        bufsize=1,  # Line-buffered output
+        universal_newlines=True # Ensure consistent newline handling
+    )
+
+    # Read the first line of stdout and strip whitespace
+    devicename_raw = process.stdout.readline().strip()
+    
+    # Normalize devicename
+    devicename_normalized = devicename_raw.lower().replace(" ", "").replace("-", "").replace("_", "") # Added _ as well
+
+    all_entries = os.listdir("/etc/deviceinfo/devices/")
+
+    print("\nComparing device name with filenames in /etc/deviceinfo/devices/:")
+    for entry in all_entries:
+      filename_without_ext = os.path.splitext(entry)[0]
+      filename_normalized = filename_without_ext.lower().replace(" ", "").replace("-", "").replace("_", "") # Added _ as well
+      if devicename_normalized == filename_normalized: # check if device is native and if so, use its deviceinfo yaml
+        yaml_path = os.path.join("/etc/deviceinfo/devices", entry)
+        break
+
+    with open(yaml_path, 'r') as file:
+      yaml_data = yaml.safe_load(file) # pull deviceinfo
+      if not yaml_data:
+        print("Error: {path} is empty (no attribute items).".format(path=yaml_path))
+        print("Defaulting to phone, as to not completely break UI.")
+        return 0 # phone
+      for device, info in yaml_data.items():
+        if info.get("DeviceType") != 'phone': # check if its a phone or not
+          return 1 # tablet
+  
   except yaml.YAMLError as e: # implement fallback to most likely option incase there is an error
     print(f"Error parsing YAML: {e}")
     print("Defaulting to phone, as to not completely break UI.")
+  
   except FileNotFoundError:
     print("Error: /etc/deviceinfo/devices/halium.yaml not found.")
     print("Defaulting to phone, as to not completely break UI.")
+  
+  except Exception as e:
+    print(f"An error occurred: {e}")
+    print("Defaulting to phone, as to not completely break UI.")
+  
+  finally:
+    if process and process.poll() is None:  # Check if the process is still running
+        print("Killing process...")
+        process.terminate()  # Send a terminate signal
+        try:
+          process.wait(timeout=5)  # Wait for the process to terminate
+        except subprocess.TimeoutExpired:
+          print("Process did not terminate gracefully, killing it.")
+          process.kill()  # Force kill if termination fails
+  
   return 0 # phone
 
 def is_usage_mode_staged() -> bool:
@@ -64,7 +113,7 @@ def is_usage_mode_staged() -> bool:
     print(f"An error occurred: {e}")
   finally:
     if process and process.poll() is None:  # Check if the process is still running
-        print("Killing QML process...")
+        print("Killing process...")
         process.terminate()  # Send a terminate signal
         try:
           process.wait(timeout=5)  # Wait for the process to terminate
@@ -85,9 +134,20 @@ system_var_dict = {
   "is-tablet" : is_tablet() # 0 for phone 1 for tablet
 }
 profile = profile.get_librewolf_default_profile() # get default profile
+dbus_monitor_thread = None
+dbus_stop_event = None
 if is_usage_mode_staged():
   chrome.INIT_CHROME(profile, system_var_dict) # copy custom css for adapting UI to default profile and read keyboard
   librewolf_overrides.copy_librewolf_overrides_cfg(profile) # copy librewolf settings overrides
+  thread_obj, event_obj = focus_monitor.monitor_dbus_and_write_to_file(profile) # run monitor for osk focus pid in dbus
+  # Assign them to global/module-level variables
+  if thread_obj and event_obj: # Check if the function returned valid objects
+      dbus_monitor_thread = thread_obj
+      dbus_stop_event = event_obj
+      dbus_monitor_thread.start() # start the thread, so monitor monitors.
+      print("D-Bus monitor thread started.")
+  else:
+      print("Failed to initialize D-Bus monitor thread.")
 else:
   chrome.delete(profile) # attempt to delete custom chrome files, so browser works unmodifed
   librewolf_overrides.copy_librewolf_overrides_cfg(profile, False) # copy librewolf settings overrides (False on Staged mode)
@@ -108,13 +168,26 @@ os.environ["DISABLE_WAYLAND"] = "1"
 # Force Wayland
 # os.environ["MOZ_ENABLE_WAYLAND"] = "1"
 
+try:
+  if len(sys.argv) > 1:
+      url_to_open = sys.argv[1]
+      # Pass the URL as an argument to librewolf
+      # The first argument to execlp after the executable name is argv[0] for the new process,
+      # so we repeat "bin/librewolf" and then add the actual arguments.
+      os.execlp("bin/AppRun", "bin/AppRun", url_to_open)
+  else:
+      # If no URL is provided, just launch librewolf normally
 
-if len(sys.argv) > 1:
-    url_to_open = sys.argv[1]
-    # Pass the URL as an argument to librewolf
-    # The first argument to execlp after the executable name is argv[0] for the new process,
-    # so we repeat "bin/librewolf" and then add the actual arguments.
-    os.execlp("bin/AppRun", "bin/AppRun", url_to_open)
+      os.execlp("bin/librewolf","bin/AppRun")
+except:
+  pass
+
+
+# stop dbus monitor
+if dbus_monitor_thread and dbus_monitor_thread.is_alive():
+    print("Signaling D-Bus monitor thread to stop...")
+    dbus_stop_event.set() # Set the event to tell the thread to exit its loop
+    dbus_monitor_thread.join() # Wait for the thread to finish its execution and cleanup
+    print("D-Bus monitor thread stopped successfully.")
 else:
-    # If no URL is provided, just launch librewolf normally
-    os.execlp("bin/librewolf","bin/AppRun")
+    print("D-Bus monitor thread was not running or not initialized, so no need to stop it.")
