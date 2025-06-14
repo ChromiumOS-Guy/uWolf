@@ -27,7 +27,7 @@ you can either create an Issue on github (faster), or you can ask in the forum [
 * Seperate Clipboard (copy/paste) then rest of system (fix coming with mir2.x subsurface support on Noble)
 * There are no default search engines due to a [bug in fx-autoconfig](https://github.com/MrOtherGuy/fx-autoconfig/issues/79) (userchrome.js loader).
 
-## circumventing bug 4:
+### circumventing bug 4:
 this will delete you're current profile (passwords/bookmark/ect), this is guaranteed to work though.
 run this:
 ``` shell
