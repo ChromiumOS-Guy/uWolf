@@ -17,9 +17,8 @@ if the browser is too small or too big please send me the output of this:
 ```echo $GRID_UNIT_PX```  with device name as issue ```getprop ro.product.name```, you are encouraged to provide more details about device.
 
 
-## I'm hunting for this:
-the monitor can only tell me when the OSK focuses IN it can't tell me if it focuses OUT, if you can find the dbus call for that or an alternative sulotion to integrate into dbus monitor service I'd be grateful.
-as current focus OUT detection is crappy at best.
+## Support:
+you can either create an Issue on github (faster), or you can ask in the forum here: (https://forums.ubports.com/topic/11060/uwolf-librewolf)
 
 
 ## know Issues
