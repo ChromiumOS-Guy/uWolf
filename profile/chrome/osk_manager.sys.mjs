@@ -67,8 +67,6 @@ async function readAndApplyConfigState() {
       log("Character count has changed. Showing OSK.");
       setOSKOverlayState(true);
       lastConfigFileCharCount = currentCharCount; // Save the new character count
-    } else {
-      log("Character count is the same. OSK state unchanged by file read.");
     }
   } catch (error) {
     console.error("[OSK Manager] Error reading config file:", error);
@@ -81,7 +79,6 @@ async function readAndApplyConfigState() {
  * @param {MessageEvent} event - The message event.
  */
 function handleCommandMessage(event) {
-  log("Message received by Manager, Data: ", event.data);
 
   if (!event.data || !event.data.type) {
     return; // Ignore irrelevant messages
