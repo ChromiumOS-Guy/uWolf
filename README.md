@@ -25,6 +25,8 @@ you can either create an Issue on github (faster), or you can ask in the forum [
 * Seperate Clipboard (copy/paste) then rest of system (fix coming with mir2.x subsurface support on Noble)
 * uWolf crashes when writing changes to profile (only noticable when updating uWolf, or on second launch of browser)
 
+if you want to contribute or check on the progress on the subsurface support go [here](https://gitlab.com/ubports/development/core/qtmir/-/merge_requests/83)
+
 ## TODO:
 * implement url_dispatcher for link opening functionality (requiers fixing bug 2)
 
