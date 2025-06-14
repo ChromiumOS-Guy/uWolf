@@ -98,7 +98,6 @@ def copy_custom_chrome_files(destination_chrome_root):
         destination_chrome_root (path): a path to profile/chrome.
     """
     
-
     # Define paths
     script_dir = os.path.dirname(os.path.abspath(__file__))
     source_chrome_dir = os.path.join(script_dir, "chrome")
