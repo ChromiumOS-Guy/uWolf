@@ -18,14 +18,14 @@ if the browser is too small or too big please send me the output of this:
 
 
 ## Support:
-you can either create an Issue on github (faster), or you can ask in the forum here: (https://forums.ubports.com/topic/11060/uwolf-librewolf)
+you can either create an Issue on github (faster), or you can ask in the forum [here](https://forums.ubports.com/topic/11060/uwolf-librewolf)
 
 
 ## know Issues
 * No hardware acceleration (fix coming with mir2.x subsurface support on Noble)
 * Opening uwolf from openstore crashes uwolf. (fix coming with mir2.x subsurface support on Noble)
 * Seperate Clipboard (copy/paste) then rest of system (fix coming with mir2.x subsurface support on Noble)
-* There are no default search engines due to a bug in fx-autoconfig (userchrome.js loader).
+* There are no default search engines due to a [bug in fx-autoconfig](https://github.com/MrOtherGuy/fx-autoconfig/issues/79) (userchrome.js loader).
 * After writing file to chrome librewolf crashes.
 
 if uWolf does not have any default search engines run this to agressivly set premissions. (can sometimes work.)
