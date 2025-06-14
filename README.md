@@ -1,6 +1,6 @@
 # uWolf
 
-A UT LibreWolf Wrapper for LibreWolf Firefox Based Browser.
+A UT Wrapper for LibreWolf Firefox Based Browser.
 this is still in early development, help welcome!
 
 It's important to note that without full hardware acceleration, performance isn't stellar, but it's generally good enough for basic Browse without heavy demands.
@@ -22,13 +22,13 @@ you can either create an Issue on github (faster), or you can ask in the forum h
 
 
 ## know Issues
-* No hardware acceleration (fix coming with mir2.x on Noble)
-* Opening uwolf from openstore crashes uwolf. (fix coming with mir2.x on Noble)
-* Seperate Clipboard (copy/paste) then rest of system (fix coming with mir2.x on Noble)
-* For some reason there are no default search engines there are no consistant patterns for why this happens.
+* No hardware acceleration (fix coming with mir2.x subsurface support on Noble)
+* Opening uwolf from openstore crashes uwolf. (fix coming with mir2.x subsurface support on Noble)
+* Seperate Clipboard (copy/paste) then rest of system (fix coming with mir2.x subsurface support on Noble)
+* There are no default search engines due to a bug in fx-autoconfig (userchrome.js loader).
 * After writing file to chrome librewolf crashes.
 
-if uWolf does not have any default search engines run this to agressivly set premissions.
+if uWolf does not have any default search engines run this to agressivly set premissions. (can sometimes work.)
 ``` shell
 cd ~/.librewolf
 sudo chown -R phablet:phablet *.default-default/
