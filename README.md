@@ -23,7 +23,7 @@ you can either create an Issue on github (faster), or you can ask in the forum [
 
 ## know Issues
 * No hardware acceleration (fix coming with mir2.x subsurface support on Noble)
-* Opening uwolf from openstore crashes uwolf. (fix coming with mir2.x subsurface support on Noble)
+* Opening uwolf from url dispatcher crashes uwolf, this also affects opening from openstore. (fix coming with mir2.x subsurface support on Noble)
 * Seperate Clipboard (copy/paste) then rest of system (fix coming with mir2.x subsurface support on Noble)
 * There are no default search engines due to a [bug in fx-autoconfig](https://github.com/MrOtherGuy/fx-autoconfig/issues/79) (userchrome.js loader).
 
