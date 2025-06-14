@@ -177,7 +177,7 @@ try:
       os.execlp("bin/AppRun", "bin/AppRun", url_to_open)
   else:
       # If no URL is provided, just launch librewolf normally
-      os.execlp("bin/librewolf","bin/AppRun")
+      os.execlp("bin/AppRun","bin/AppRun")
 except:
   pass
 

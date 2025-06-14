@@ -27,7 +27,19 @@ you can either create an Issue on github (faster), or you can ask in the forum [
 * Seperate Clipboard (copy/paste) then rest of system (fix coming with mir2.x subsurface support on Noble)
 * There are no default search engines due to a [bug in fx-autoconfig](https://github.com/MrOtherGuy/fx-autoconfig/issues/79) (userchrome.js loader).
 
-if uWolf does not have any default search engines run this to agressivly set premissions. (can sometimes work.)
+## circumventing bug 4:
+this will delete you're current profile (passwords/bookmark/ect), this is guaranteed to work though.
+run this:
+``` shell
+rm -rf ~/.librewolf/
+sudo mv /opt/click.ubuntu.com/uwolf.chromiumos-guy/current/bin/defaults/pref/config-prefs.js /opt/click.ubuntu.com/uwolf.chromiumos-guy/current/bin/defaults/pref/config-prefs.js.disabled
+```
+then run librewolf, follow setup process step 1,
+when step 1 is finished close librewolf and run this:
+```shell
+sudo mv /opt/click.ubuntu.com/uwolf.chromiumos-guy/current/bin/defaults/pref/config-prefs.js.disabled /opt/click.ubuntu.com/uwolf.chromiumos-guy/current/bin/defaults/pref/config-prefs.js
+```
+if this still doesn't work try running this:
 ``` shell
 cd ~/.librewolf
 sudo chown -R phablet:phablet *.default-default/
