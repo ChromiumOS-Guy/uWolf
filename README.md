@@ -29,6 +29,7 @@ if you want to contribute or check on the progress on the subsurface support go 
 
 ## TODO:
 * implement url_dispatcher for link opening functionality (requiers fixing bug 2)
+* mangle tabbar into a tab drawer.
 
 ### License
 
