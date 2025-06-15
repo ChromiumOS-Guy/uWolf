@@ -5,21 +5,22 @@ this is still in early development, help welcome!
 
 It's important to note that without full hardware acceleration, performance isn't stellar, but it's generally good enough for basic Browse without heavy demands.
 
+Youtube Short Demo: https://youtube.com/shorts/8IigTL3g1t8
+
+## Setup:
 The setup process is straightforward:
  -  Stage 1: On your very first launch, uWolf will download necessary extensions. This takes a moment.
  -  Stage 2: After extensions are ready, a quick restart is needed. This loads the custom mobile UI to make things look right.
 
 It is Important to note that every version update you are encouraged to clear startup cache here: about:support, if there are any problems.
 
-Youtube Short Demo: https://youtube.com/shorts/8IigTL3g1t8
+## Support:
+you can either create an Issue on github (faster), or you can ask in the forum [here](https://forums.ubports.com/topic/11060/uwolf-librewolf) (doubles as DEVLOG).
 
 if the browser is too small or too big please send me the output of this:
 ```echo $GRID_UNIT_PX```  with device name as issue ```getprop ro.product.name```, you are encouraged to provide more details about device.
 
-## Support:
-you can either create an Issue on github (faster), or you can ask in the forum [here](https://forums.ubports.com/topic/11060/uwolf-librewolf).
-
-## know Issues
+## Known Issues:
 * No hardware acceleration (fix coming with mir2.x subsurface support on Noble)
 * Opening uwolf from url dispatcher crashes uwolf, this also affects opening from openstore. (fix coming with mir2.x subsurface support on Noble)
 * Seperate Clipboard (copy/paste) then rest of system (fix coming with mir2.x subsurface support on Noble)
