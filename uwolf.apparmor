@@ -2,6 +2,7 @@
     "policy_groups": [
         "audio",
         "networking",
+        "location",
         "keep-display-on"
     ],
     "policy_version": 20.04,

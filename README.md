@@ -21,16 +21,20 @@ if the browser is too small or too big please send me the output of this:
 ```echo $GRID_UNIT_PX```  with device name as issue ```getprop ro.product.name```, you are encouraged to provide more details about device.
 
 ## Known Issues:
+* OSK takes a bit of time to load due to plugin initalizing last. (not fixable)
 * No hardware acceleration (fix coming with mir2.x subsurface support on Noble)
 * Opening uwolf from url dispatcher crashes uwolf, this also affects opening from openstore. (fix coming with mir2.x subsurface support on Noble)
 * Seperate Clipboard (copy/paste) then rest of system (fix coming with mir2.x subsurface support on Noble)
+* Inputs on the right side of the screen do not work in landscape mode (fix PROBABLY MAYBE coming with mir2.x subsurface support on Noble)
 * uWolf crashes when writing changes to profile (only noticable when updating uWolf, or on second launch of browser)
+* Addons not visibale, no ability to install extenstions due to the drop-down menu for adding them getting hidden
+
 
 if you want to contribute or check on the progress on the subsurface support go [here](https://gitlab.com/ubports/development/core/qtmir/-/merge_requests/83)
 
 ## TODO:
 * implement url_dispatcher for link opening functionality (requiers fixing bug 2)
-* mangle tabbar into a tab drawer.
+* completly turn UI to mobilem with userchrome.js settings no UIX element will be speared (please help).
 
 ### License
 
