@@ -33,7 +33,7 @@ if the browser is too small or too big please send me the output of this:
 if you want to contribute or check on the progress on the subsurface support go [here](https://gitlab.com/ubports/development/core/qtmir/-/merge_requests/83)
 
 ## TODO:
-* implement url_dispatcher for link opening functionality (requiers fixing bug 2)
+* implement url_dispatcher for link opening functionality (requiers fixing bug 3)
 * #### completly turn UI to mobile with userchrome.js settings no UIX element will be spared (please help me if you're good at CSS or JavaScript, its not hard just time consuming work.):
     * move urlbar down and have navigation and panelUI (settings/addons/account/download buttons) ontop. (will fix all addon Issues).
     * add desktop/mobile mode for websites on panelUI settings menu.
