@@ -34,7 +34,12 @@ if you want to contribute or check on the progress on the subsurface support go 
 
 ## TODO:
 * implement url_dispatcher for link opening functionality (requiers fixing bug 2)
-* completly turn UI to mobilem with userchrome.js settings no UIX element will be speared (please help).
+#### * completly turn UI to mobile with userchrome.js settings no UIX element will be speared (please help me if you're good at CSS or JavaScript, its not hard just time consuming work.):
+    * move urlbar down and have navigation and panelUI (settings/addons/account/download buttons) ontop. (will fix all addon Issues).
+    * add desktop/mobile mode for websites on panelUI settings menu.
+    * changes tabbar into a tab drawer.
+    * change the layout of every about: page with custom CSS injection to make it work for mobile.
+
 
 ### License
 
