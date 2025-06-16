@@ -16,7 +16,9 @@ if [ ! -d "${INSTALL_DIR}/bin" ]; then # sanity check librewolf-d.sh worked
   exit 1
 fi
 
-/bin/cp -r $fxautoconfig_dir/program/* $INSTALL_DIR/bin/ #copy loading script
+/bin/echo -e """\n//=================================\n//START OF FX-AUTOCONFIG CONFIG.JS\n//=================================\n""">> $INSTALL_DIR/bin/librewolf.cfg # make some space (the start/end \n is very important)
+
+/bin/cat $fxautoconfig_dir/program/config.js >> $INSTALL_DIR/bin/librewolf.cfg #inject loading script into Librewolfs own.
 
 /bin/mkdir -p $INSTALL_DIR/profile/chrome # make sure dir exists
 

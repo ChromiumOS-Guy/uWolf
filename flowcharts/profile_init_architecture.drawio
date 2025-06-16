@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="nbfTAc3BsVZHMYUAhAVt" name="Page-1">
-        <mxGraphModel dx="2038" dy="641" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1834" dy="531" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -14,14 +14,6 @@
                 </mxCell>
                 <mxCell id="2" value="profile.py" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
                     <mxGeometry x="680" y="120" width="120" height="60" as="geometry"/>
-                </mxCell>
-                <mxCell id="24" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="3" target="7">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="31" value="copies a healthy search engine database&lt;br&gt;to the correct location in profile" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="24">
-                    <mxGeometry x="-0.2798" relative="1" as="geometry">
-                        <mxPoint y="4" as="offset"/>
-                    </mxGeometry>
                 </mxCell>
                 <mxCell id="3" value="chrome.py" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
                     <mxGeometry x="320" y="240" width="120" height="60" as="geometry"/>
@@ -77,11 +69,6 @@
                 <UserObject label="keyboard.qml" link="keyboard.qml" id="6">
                     <mxCell style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
                         <mxGeometry x="80" y="120" width="120" height="60" as="geometry"/>
-                    </mxCell>
-                </UserObject>
-                <UserObject label="3870112724rsegmnoittet-es.sqlite" link="3870112724rsegmnoittet-es.sqlite" id="7">
-                    <mxCell style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                        <mxGeometry x="305" y="370" width="150" height="60" as="geometry"/>
                     </mxCell>
                 </UserObject>
                 <mxCell id="8" value="librewolf.overrides.cfg/&lt;br&gt;librewolf.overrides.cfg.notstaged" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">

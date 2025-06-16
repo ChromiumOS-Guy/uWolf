@@ -19,8 +19,6 @@ def INIT_CHROME(profile_info : list, system_var_dict : dict):
         print(f"Error: Profile path does not exist! ({profile_path})")
         return
 
-    inject_search_engines_database(profile_path) # inject working DB of search engines as a workaround to this bug: (https://github.com/MrOtherGuy/fx-autoconfig/issues/79)
-
     destination_chrome_root = os.path.join(profile_path, "chrome") # save destination chrome folder path
 
     copy_custom_chrome_files(destination_chrome_root) # copy chrome .css files
@@ -28,73 +26,6 @@ def INIT_CHROME(profile_info : list, system_var_dict : dict):
     generate_css_variables(destination_chrome_root, system_var_dict) ## generate css keyboard files
 
 #### END CHROME INIT ####
-
-#### START SEARCH ENGINE INJECTION ####
-
-import os
-import fnmatch
-import shutil
-import filecmp
-
-def inject_search_engines_database(profile_path):
-    searchenginepath = os.path.join(profile_path, "storage", "permanent", "chrome", "idb")
-    destination_search_engine_file = None  # Initialize to None, in case no match is found
-
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    source_search_engine_file = os.path.join(script_dir, "3870112724rsegmnoittet-es.sqlite")
-
-    try:
-        if not os.path.isdir(searchenginepath):
-            print(f"Warning: Directory not found: {searchenginepath}. Cannot inject search engines.")
-            return
-
-        for filename in os.listdir(searchenginepath):
-            # Use fnmatch for wildcards, matching "anything" followed by "rsegmnoittet-es.sqlite"
-            if fnmatch.fnmatch(filename, "*rsegmnoittet-es.sqlite"):
-                destination_search_engine_file = os.path.join(searchenginepath, filename)
-                break  # Found the file, no need to search further
-
-        if destination_search_engine_file is None:
-            print(f"Info: No existing search engine database matching '*rsegmnoittet-es.sqlite' found in {searchenginepath}. Will attempt to copy a new one.")
-            destination_search_engine_file = os.path.join(searchenginepath, os.path.basename(source_search_engine_file))
-            
-        # Ensure the source file exists before proceeding
-        if not os.path.exists(source_search_engine_file):
-            print(f"Error: Source search engine file not found: {source_search_engine_file}. Cannot inject.")
-            return
-
-        # Check if destination file exists and is different from source
-        if os.path.exists(destination_search_engine_file):
-            try:
-                if not filecmp.cmp(source_search_engine_file, destination_search_engine_file, shallow=False):
-                    print(f"Existing database at {destination_search_engine_file} is different. Attempting to replace.")
-                    try:
-                        os.remove(destination_search_engine_file)
-                        if os.path.exists(destination_search_engine_file):
-                            print("Error: Failed to delete defunct search engine database when attempting removal.")
-                            return
-                    except OSError as e:
-                        print(f"Error deleting old database {destination_search_engine_file}: {e}")
-                        return
-                else:
-                    print(f"Search engine database at {destination_search_engine_file} is already up to date. No action needed.")
-                    return # File is already the same, no injection needed
-            except OSError as e:
-                print(f"Error comparing files {source_search_engine_file} and {destination_search_engine_file}: {e}")
-                return
-            
-        # Copy the file
-        try:
-            shutil.copy2(source_search_engine_file, destination_search_engine_file)
-            print("Successfully injected working search engine database.")
-        except IOError as e:
-            print(f"Error copying search engine database from {source_search_engine_file} to {destination_search_engine_file}: {e}")
-
-    except Exception as e:
-        print(f"An unexpected error occurred during database injection: {e}")
-
-
-#### END SEARCH ENGINE INJECTION ####
 
 #### START GENERATE KEYBOARD PARAMETERS ####
 

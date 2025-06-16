@@ -29,7 +29,6 @@ if the browser is too small or too big please send me the output of this:
 if you want to contribute or check on the progress on the subsurface support go [here](https://gitlab.com/ubports/development/core/qtmir/-/merge_requests/83)
 
 ## TODO:
-* implement solution suggested by MrOtherGuy [here](https://github.com/MrOtherGuy/fx-autoconfig/issues/54#issuecomment-2231245533) for the Issue [here](https://github.com/MrOtherGuy/fx-autoconfig/issues/79).
 * implement url_dispatcher for link opening functionality (requiers fixing bug 2)
 * mangle tabbar into a tab drawer.
 
