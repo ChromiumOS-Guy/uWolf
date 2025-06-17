@@ -28,6 +28,8 @@ if the browser is too small or too big please send me the output of this:
 * Inputs on the right side of the screen do not work in landscape mode (fix PROBABLY MAYBE coming with mir2.x subsurface support on Noble)
 * uWolf crashes when writing changes to profile (only noticable when updating uWolf, or on second launch of browser)
 * Addons not visibale, no ability to install extenstions due to the drop-down menu for adding them getting hidden
+* Drop down boxes are buggy here is a [video](https://www.youtube.com/shorts/o5OpgXKtTWk) by @haagch
+* 
 
 
 if you want to contribute or check on the progress on the subsurface support go [here](https://gitlab.com/ubports/development/core/qtmir/-/merge_requests/83)
