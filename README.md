@@ -27,9 +27,6 @@ if the browser is too small or too big please send me the output of this:
 * Seperate Clipboard (copy/paste) then rest of system (fix coming with mir2.x subsurface support on Noble)
 * Inputs on the right side of the screen do not work in landscape mode (fix PROBABLY MAYBE coming with mir2.x subsurface support on Noble)
 * uWolf crashes when writing changes to profile (only noticable when updating uWolf, or on second launch of browser)
-* Addons not visibale, no ability to install extenstions due to the drop-down menu for adding them getting hidden
-* Drop down boxes are buggy here is a [video](https://www.youtube.com/shorts/o5OpgXKtTWk) by @haagch
-* 
 
 
 if you want to contribute or check on the progress on the subsurface support go [here](https://gitlab.com/ubports/development/core/qtmir/-/merge_requests/83)
@@ -37,7 +34,6 @@ if you want to contribute or check on the progress on the subsurface support go 
 ## TODO:
 * implement url_dispatcher for link opening functionality (requiers fixing bug 3)
 * #### completly turn UI to mobile with userchrome.js settings no UIX element will be spared (please help me if you're good at CSS or JavaScript, its not hard just time consuming work.):
-    * move urlbar down and have navigation and panelUI (settings/addons/account/download buttons) ontop. (will fix all addon Issues).
     * add desktop/mobile mode for websites on panelUI settings menu.
     * changes tabbar into a tab drawer.
     * change the layout of every about: page with custom CSS injection to make it work for mobile.

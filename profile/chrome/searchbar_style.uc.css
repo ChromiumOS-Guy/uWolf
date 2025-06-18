@@ -12,7 +12,7 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* 1. Navigation Bar (#nav-bar) Styling */
+/* Main Navigation Bar Adjustments */
 #nav-bar {
   display: flex !important; /* Keep flex display as it's default for Firefox toolbars */
   visibility: visible !important;
@@ -31,220 +31,38 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* 2. Streamlined Buttons (Left and Right) */
-
-/* General styling for toolbar buttons on nav-bar */
-#nav-bar .toolbarbutton-1 {
-  padding: 10px 12px !important;
-  margin: 0 1px !important; /* Less padding between buttons */
-  border-radius: 8px !important;
-  transition: background-color 0.2s ease !important;
-  flex-shrink: 0 !important; /* Prevent shrinking */
-}
-
-#nav-bar .toolbarbutton-1:hover {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* Explicitly make the essential navigation buttons visible */
-#back-button,
-#forward-button {
-  visibility: visible !important;
-  display: flex !important;
-}
-
-/* --- REVISED MODIFICATION START --- */
-/*
-  The goal is to ensure only one of these is ever visible.
-  Firefox's default behavior is to apply 'display: none'
-  via the 'hidden' attribute. If that's not working,
-  we force it.
-*/
-
-/* Always ensure stop-button is hidden if reload-button is *not* hidden */
-#reload-button:not([hidden]) + #stop-button {
-  display: none !important;
+/* Hide Bookmarks Bar */
+#PersonalToolbar {
   visibility: collapse !important;
-}
-
-/* Always ensure reload-button is hidden if stop-button is *not* hidden */
-#stop-button:not([hidden]) + #reload-button {
-  display: none !important;
-  visibility: collapse !important;
-}
-
-/* Fallback: Ensure they are hidden by default if the hidden attribute is problematic */
-/* This might be redundant if the above works, but provides extra force */
-#stop-button[hidden],
-#reload-button[hidden] {
-  display: none !important;
-  visibility: collapse !important;
-}
-
-/* Ensure they are visible when they are supposed to be */
-#reload-button:not([hidden]),
-#stop-button:not([hidden]) {
-  visibility: visible !important;
-  display: flex !important; /* or 'block' if needed, but flex is common for toolbar items */
-}
-/* --- REVISED MODIFICATION END --- */
-
-
-/* Hide the Home button */
-#home-button {
-  display: none !important;
-  visibility: collapse !important;
-}
-
-/* Hide most other buttons in the navigation bar.
-   Crucially, this list *excludes* elements directly inside #urlbar-container
-   that are essential for search functionality.
-*/
-#nav-bar > .toolbarbutton-1:not(#back-button):not(#forward-button):not(#reload-button):not(#stop-button):not(#PanelUI-button),
-#unified-extensions-button, /* Unified extensions button (Add-ons Tray) */
-#account-button,            /* Account button */
-#page-action-buttons,       /* The group of page action buttons (star, reader mode, etc.) */
-#tracking-protection-icon-container, /* Tracking protection icon */
-#identity-box,              /* Site identity box (lock icon) */
-#reader-mode-button,        /* Reader mode button */
-#PanelUI-multiView          /* Main menu panel itself - This hides everything inside the Firefox menu that opens */
-{
-  display: none !important;
-  visibility: collapse !important;
+  max-height: 0 !important;
+  overflow: hidden !important; /* Ensures no content spills out */
 }
 
 /* -------------------------------------------------------------------------- */
-/* 3. Settings Button (PanelUI-button) - Positioned far right naturally */
-#PanelUI-button {
-  position: relative !important;
-  top: auto !important;
-  left: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  z-index: auto !important;
-  background-color: var(--lwt-accent-color, #2d2d2d) !important;
-  border-radius: 8px !important;
-  padding: 10px 12px !important;
-  box-shadow: none !important;
-  visibility: visible !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: auto !important;
-  height: auto !important;
-  margin-left: 8px !important; /* Adjust this value as needed */
-  flex-shrink: 0 !important; /* Prevent shrinking to ensure it doesn't get pushed by urlbar */
-}
-
-#PanelUI-button .toolbarbutton-icon {
-  width: 24px !important;
-  height: 24px !important;
-  fill: var(--lwt-toolbar-color, white) !important;
-}
-
-#PanelUI-button .toolbarbutton-text {
-  display: none !important;
-}
-
-/* -------------------------------------------------------------------------- */
-/* 4. Tabs Bar (#TabsToolbar) - Standard positioning */
-#TabsToolbar {
-  visibility: visible !important;
-  display: flex !important;
+/* Clean Up Add-on Tray (Remove margins/paddings on addon tray buttons/icons) */
+/* This targets common elements for extension buttons and their containers */
+#PanelUI-button,
+#customization-container .toolbarbutton-1,
+#nav-bar-customization-target toolbarbutton,
+#nav-bar-customization-target .toolbar-icon {
   margin: 0 !important;
   padding: 0 !important;
-  min-height: unset !important;
-  height: auto !important;
-  transform: none !important;
 }
 
-/* -------------------------------------------------------------------------- */
-/* 5. Autofill Suggestions (URL bar results) - Open Downwards */
-#urlbar-results {
-  position: relative !important;
-  bottom: auto !important;
-  left: auto !important;
-  right: auto !important;
-  width: auto !important;
-  max-height: 50vh !important;
-  overflow-y: auto !important;
-  background-color: var(--lwt-accent-color, rgba(45, 45, 45, 0.98)) !important;
-  border-top: none !important;
-  border-bottom: 1px solid var(--lwt-toolbar-border-color, rgba(0,0,0,0.3)) !important;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.6) !important;
-  z-index: auto !important;
-  border-radius: 0 0 15px 15px !important;
-  padding-top: 0 !important;
-  display: block !important; /* Ensure visibility for suggestions */
-  visibility: visible !important;
+/* Specific adjustments for the container of flexible space and add-ons within the nav bar */
+#nav-bar .toolbar-addressbar-container,
+#nav-bar .toolbar-growable-spacer {
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-.urlbar-result {
-  padding: 10px 15px !important;
-  color: var(--lwt-toolbar-color, white) !important;
-  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+/* Ensure add-on icons themselves are compact */
+.toolbar-icon {
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-.urlbar-result:last-child {
-  border-bottom: none !important;
-}
-
-.urlbar-result[selected] {
-  background-color: rgba(255,255,255,0.15) !important;
-}
-
-/* Re-enabling some URL bar suggestion components for richer suggestions */
-.urlbar-result-action,
-.urlbar-result-type-icon {
-  display: flex !important; /* or 'block' if you prefer */
-  visibility: visible !important;
-}
-
-.urlbar-result-match {
-  font-weight: bold !important;
-  color: var(--lwt-toolbar-field-color, white) !important;
-}
-
-.urlbar-result-url,
-.urlbar-result-title {
-  color: var(--lwt-toolbar-color, #CCCCCC) !important;
-  font-size: 0.9em !important;
-}
-.urlbar-result-url { display: block !important; }
-
-/* --- URL BAR MIN-WIDTH and overflow fix --- */
-#urlbar-container {
-  min-width: 100px !important; /* Adjust this value as needed */
-  flex-grow: 1 !important; /* Ensure it takes available space */
-  /* Remove the max-width calculation as it might interfere with dynamic sizing,
-     and rely on flex-shrink:0 on PanelUI-button and default flex behavior
-     to prevent overflow. If overflow still occurs, a more robust max-width
-     might be needed, but usually, default flex behavior handles this. */
-}
-/* ------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/* 6. Hide other UI elements */
-#PersonalToolbar,
-#toolbar-menubar,
-#titlebar,
-#customization-toolbar,
-#addon-bar,
-#status-bar,
-#browser-bottombox {
-  display: none !important;
-  visibility: collapse !important;
-}
-
-/* Ensure the main browser content area is not hidden */
-#appcontent, #browser-content-wrapper {
-  visibility: visible !important;
-  display: block !important;
-}
-
-/* -------------------------------------------------------------------------- */
-/* 7. Auto-hide search bar and tabs bar when in full screen */
-:root[inFullscreen="true"] #nav-bar,
-:root[inFullscreen="true"] #TabsToolbar {
-  display: none !important;
+/* Move Bookmark Button to the Rightmost Corner */
+#bookmarks-menu-button {
+  margin-left: auto !important; /* Pushes the button to the far right */
 }

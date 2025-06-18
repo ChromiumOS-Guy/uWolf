@@ -55,9 +55,8 @@
   line-height: 65px !important; /* Helps center text vertically if it's not already */
 }
 
-/* Ensure the tab container itself can accommodate the taller tabs */
 #tabbrowser-tabs {
-  padding-left: 10px !important;
+  padding-left: 80px !important; /* Increased padding to make space for the settings menu */
   padding-right: 10px !important;
   column-gap: 8px !important;
   /* Ensure this container can grow vertically if needed to fit tabs */
@@ -66,6 +65,44 @@
   display: flex !important; /* Use flexbox to better control child alignment and spacing */
   align-items: center !important; /* Vertically center the tabs within the tabbar-tabs container */
 }
+
+#PanelUI-button {
+  position: relative !important;
+  bottom: auto !important;
+  z-index: auto !important;
+  background-color: var(--lwt-accent-color, #2d2d2d) !important;
+  border-radius: 8px !important;
+  padding: 10px 12px !important;
+  box-shadow: none !important;
+  visibility: visible !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  height: auto !important;
+  margin-left: 4px !important; /* Adjust this value as needed */
+  flex-shrink: 0 !important; /* Prevent shrinking to ensure it doesn't get pushed by urlbar */
+}
+
+#PanelUI-button .toolbarbutton-icon {
+  width: 24px !important;
+  height: 24px !important;
+  fill: var(--lwt-toolbar-color, white) !important;
+}
+
+#PanelUI-button .toolbarbutton-text {
+  display: none !important;
+}
+
+#PanelUI-menu-button {
+  position: fixed !important;
+  bottom: calc(max(45px, min(7vh, 120px)) / 2)  !important;
+  transform: translateY(50%) !important;
+  right: auto !important; /* Increased right margin to make space */
+  left: 10px !important; /* Set the left position to create space between the settings menu and tabs */
+  z-index: 1000 !important;
+}
+
 
 /* Optional: Adjust the new tab button position and size if it looks off */
 .tabs-newtab-button {
