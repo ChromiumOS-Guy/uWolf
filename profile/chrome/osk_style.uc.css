@@ -28,8 +28,8 @@
   );
 
   /* Define variables for the scaled OSK height */
-  --active-portrait-o-s-k-height-scaled: calc(var(--calculated-osk-height-portrait) * (1 / var(--scaling)) - max(45px, min(7vh, 120px) * 1.5)); /* the -52px is to accomdate the tab bar on the bottom*/
-  --active-landscape-o-s-k-height-scaled: calc(var(--calculated-osk-landscape-height) * (1 / var(--scaling)) - max(45px, min(7vh, 120px) * 1.5));
+  --active-portrait-o-s-k-height-scaled: calc(var(--calculated-osk-height-portrait) * (1 / var(--scaling)) - max(45px, min(7vh, 120px))); /* the -52px is to accomdate the tab bar on the bottom*/
+  --active-landscape-o-s-k-height-scaled: calc(var(--calculated-osk-landscape-height) * (1 / var(--scaling)) - max(45px, min(7vh, 120px)));
 
   /* Apply a general transition to the root element for smoother changes */
   transition: all 0.2s ease-out !important;
