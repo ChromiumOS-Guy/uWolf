@@ -18,18 +18,18 @@
   /* Dynamically select the active portrait height based on --is-tablet. */
   --calculated-osk-height-portrait: calc(
     var(--calculated-o-s-kphone-portrait-height) * (1 - var(--is-tablet)) +
-    var(--calculated-o-s-ktablet-portrait-height) * var(--is-tablet)
+    var(--calculated-o-s-ktablet-portrait-height) * var(--is-tablet) - max(45px, min(7vh, 120px) * var(--scaling) * 1.07) /* the px calc is to accomdate the tab bar on the bottom*/
   );
 
   /* Dynamically select the active landscape height based on --is-tablet. */
   --calculated-osk-height-landscape: calc(
     var(--calculated-o-s-kphone-landscape-height) * (1 - var(--is-tablet)) +
-    var(--calculated-o-s-ktablet-landscape-height) * var(--is-tablet)
+    var(--calculated-o-s-ktablet-landscape-height) * var(--is-tablet) - max(45px, min(7vh, 120px) * var(--scaling) * 1.07)
   );
 
   /* Define variables for the scaled OSK height */
-  --active-portrait-o-s-k-height-scaled: calc(var(--calculated-osk-height-portrait) * (1 / var(--scaling)) - max(45px, min(7vh, 120px))); /* the -52px is to accomdate the tab bar on the bottom*/
-  --active-landscape-o-s-k-height-scaled: calc(var(--calculated-osk-landscape-height) * (1 / var(--scaling)) - max(45px, min(7vh, 120px)));
+  --active-portrait-o-s-k-height-scaled: calc(var(--calculated-osk-height-portrait) * (1 / var(--scaling))); 
+  --active-landscape-o-s-k-height-scaled: calc(var(--calculated-osk-landscape-height) * (1 / var(--scaling)));
 
   /* Apply a general transition to the root element for smoother changes */
   transition: all 0.2s ease-out !important;
