@@ -28,8 +28,9 @@ if the browser is too small or too big please send me the output of this:
 * uWolf crashes when writing changes to profile (only noticable when updating uWolf, or on second launch of browser)
 * Pressing drop down menus such as addons or bookmarks somehow kills OSK
 * #### LANDSCAPE Issues:
-    * Inputs on the right side of the screen do not work in landscape mode (fix PROBABLY MAYBE coming with mir2.x subsurface support on Noble)
-    * Settings can only be access in portrait mode (fix PROBABLY MAYBE coming with mir2.x subsurface support on Noble)
+    * Inputs on the right side of the screen do not work in landscape mode (fix coming when [this](https://gitlab.com/ubports/development/core/lomiri/-/merge_requests/207) is merged)
+    * Settings can only be access in portrait mode (fix PROBABLY MAYBE coming with mir2.x subsurface support on Noble) 
+    * Settings not fitting screen in landscape in older versions (might be fixed by [this](https://connect.mozilla.org/t5/discussions/firefox-settings-design-share-your-input/m-p/66629/highlight/true#M23625))
     * Tabbar broken on Landscape
 
 if you want to contribute or check on the progress on the subsurface support go [here](https://gitlab.com/ubports/development/core/qtmir/-/merge_requests/83)
