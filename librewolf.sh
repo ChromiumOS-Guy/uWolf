@@ -126,7 +126,7 @@ def is_usage_mode_staged() -> bool:
   return False # if check fails then its not Staged
 
 #### GLOBAL VARIABLES
-scaling = str(float(os.environ["GRID_UNIT_PX"])/scalingdevidor())
+scaling = str(max(0.7, min(float(os.environ["GRID_UNIT_PX"])/scalingdevidor(), 2.4)))
 
 #### profile stuff
 system_var_dict = {
