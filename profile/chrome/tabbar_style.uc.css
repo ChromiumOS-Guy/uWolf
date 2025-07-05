@@ -9,6 +9,22 @@
 
 /* Moves tabs to the bottom of the window */
 
+/* Define CSS variables for tab bar height and border */
+:root {
+  --tab-bar-height: 7vh;
+  --tab-bar-min-height: 45px;
+  --tab-bar-max-height: 120px;
+  --tab-bar-border-top: 1px; /* Variable for the border thickness */
+  /* Calculate the effective height of the tab bar for use in other elements */
+  --tab-bar-effective-height: calc(max(var(--tab-bar-min-height), min(var(--tab-bar-height), var(--tab-bar-max-height))));
+  --tab-effective-height: calc(var(--tab-bar-effective-height) - (0.5vh +1px)); /* Adjusted to reflect the new tab height */
+
+  /* Variables for the fixed left menu button space */
+  --fixed-left-button-width: 60px; /* Estimate width of #PanelUI-menu-button */
+  --fixed-left-button-offset: 10px; /* 'left' value of #PanelUI-menu-button */
+  --fixed-left-button-total-space: calc(var(--fixed-left-button-width) + var(--fixed-left-button-offset) + 10px); /* Total space needed on left, + some buffer */
+}
+
 /* Make the tab bar appear at the bottom */
 #TabsToolbar {
   -moz-box-ordinal-group: 2 !important; /* This moves the tabs below the content */
@@ -16,24 +32,26 @@
   bottom: 0 !important;
   width: 100% !important;
   background-color: var(--lwt-accent-color, #f9f9fb) !important; /* Adjust background color as needed */
-  border-top: 1px solid var(--lwt-accent-color, #ccc) !important; /* Add a top border */
-  /* Ensure the tab bar itself has enough space.
-     We use a direct height to override any potential min/max height conflicts more strongly,
-     and add !important for maximum specificity.
-     Original 52px + 15px = 67px.
-  */
-  height: 7vh !important;
-  min-height: 45px !important; /* Keep min-height for robustness */
-  max-height: 120px !important; /* Add max-height to ensure it doesn't grow too much */
+  border-top: var(--tab-bar-border-top) solid var(--lwt-accent-color, #ccc) !important; /* Add a top border */
+  height: var(--tab-bar-height) !important;
+  min-height: var(--tab-bar-min-height) !important;
+  max-height: var(--tab-bar-max-height) !important;
+
+  /* Use flexbox to arrange items horizontally */
+  display: flex !important;
+  align-items: center !important; /* Vertically center items */
+  justify-content: center !important; /* Center the overall group of flex items */
+  box-sizing: border-box !important; /* Include padding in the element's total width/height */
+
+  /* Add padding on the left to make space for the fixed #PanelUI-menu-button */
+  padding-left: var(--fixed-left-button-total-space) !important;
+  padding-right: 10px !important; /* General padding on the right */
 }
 
 /* Adjust the main browser content area to make space for the tabs at the bottom */
 #browser {
-  /* Increased margin to account for larger tab bar height.
-     This calculation needs to be robust. Using the exact height from TabsToolbar.
-     Original 52px + 15px + 1px (border) = 68px.
-  */
-  margin-bottom: 68px !important;
+  /* Margin accounts for the tab bar's effective height plus its border */
+  margin-bottom: calc(var(--tab-bar-effective-height) + var(--tab-bar-border-top)) !important;
 }
 
 /* Hide the default tab bar at the top if it's still visible or causing issues */
@@ -43,32 +61,42 @@
 
 /* Adjust the height of the individual tabs */
 #TabsToolbar .tabbrowser-tab {
-  /* Make individual tabs taller for easier tapping and a thicker feel.
-     Original 50px + 15px = 65px.
-     Using both min-height and max-height with !important to ensure consistent sizing.
-  */
-  min-height: 65px !important;
-  max-height: 65px !important;
-  /* Add more horizontal padding to make tabs wider and easier to tap */
+  min-height: var(--tab-effective-height) !important; /* Updated */
+  max-height: var(--tab-effective-height) !important; /* Updated */
   padding-inline: 20px !important;
-  /* Align content vertically within the tab */
-  line-height: 65px !important; /* Helps center text vertically if it's not already */
+  line-height: var(--tab-effective-height) !important; /* Updated */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 #tabbrowser-tabs {
-  padding-left: 80px !important; /* Increased padding to make space for the settings menu */
-  padding-right: 10px !important;
+  padding-left: 0 !important; /* Remove individual padding, TabsToolbar has overall padding */
+  padding-right: 0 !important;
   column-gap: 8px !important;
-  /* Ensure this container can grow vertically if needed to fit tabs */
-  height: 100% !important; /* Make sure it takes available height of its parent */
-  min-height: 65px !important; /* Match tab height */
-  display: flex !important; /* Use flexbox to better control child alignment and spacing */
-  align-items: center !important; /* Vertically center the tabs within the tabbar-tabs container */
+  height: 100% !important;
+  min-height: var(--tab-effective-height) !important; /* Updated */
+  display: flex !important;
+  align-items: center !important;
+  overflow-x: auto !important; /* Allow tabs to scroll horizontally if they overflow */
+  overflow-y: hidden !important;
+  flex-grow: 1 !important; /* Allow tabs to take up available space */
+  justify-content: center !important; /* Center the tabs themselves within the available space */
 }
 
+/* Ensure tab content is centered */
+.tab-content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/* #PanelUI-button - The regular menu button (hamburger) */
 #PanelUI-button {
-  position: relative !important;
-  bottom: auto !important;
+  position: relative !important; /* Keep it in flow of flexbox */
+  bottom: auto !important; /* Remove old fixed positioning properties */
   z-index: auto !important;
   background-color: var(--lwt-accent-color, #2d2d2d) !important;
   border-radius: 8px !important;
@@ -80,8 +108,10 @@
   justify-content: center !important;
   width: auto !important;
   height: auto !important;
-  margin-left: 4px !important; /* Adjust this value as needed */
-  flex-shrink: 0 !important; /* Prevent shrinking to ensure it doesn't get pushed by urlbar */
+  margin-left: 4px !important; /* Existing margin */
+  flex-shrink: 0 !important; /* Prevent shrinking */
+  /* This margin helps separate it from the tabs when they are centered */
+  margin-right: 10px !important; /* Add some space to its right, separating it from tabs */
 }
 
 #PanelUI-button .toolbarbutton-icon {
@@ -94,29 +124,27 @@
   display: none !important;
 }
 
+/* #PanelUI-menu-button - The FIXED left-side button */
 #PanelUI-menu-button {
   position: fixed !important;
-  bottom: calc(max(45px, min(7vh, 120px)) / 2)  !important;
+  /* Dynamically position based on the tab bar's effective height, centered vertically */
+  bottom: calc(var(--tab-bar-effective-height) / 2) !important;
   transform: translateY(50%) !important;
-  right: auto !important; /* Increased right margin to make space */
-  left: 10px !important; /* Set the left position to create space between the settings menu and tabs */
+  right: auto !important; /* Ensure it stays on the left */
+  left: var(--fixed-left-button-offset) !important; /* Uses the variable for its left offset */
   z-index: 1000 !important;
 }
-
 
 /* Optional: Adjust the new tab button position and size if it looks off */
 .tabs-newtab-button {
   margin-inline-end: 0px !important;
-  margin-inline-start: 10px !important;
-  /* Make the new tab button larger and easier to tap (consistent with tab height).
-     Original 45px + 15px = 60px.
-  */
+  margin-inline-start: 10px !important; /* Space from the tabs */
   min-width: 60px !important;
   min-height: 60px !important;
-  /* Also ensure it's centered if using flexbox */
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+  flex-shrink: 0 !important; /* Prevent shrinking */
 }
 
 /* Ensure the window controls (minimize, maximize, close) are still accessible */
@@ -124,16 +152,13 @@
   -moz-box-ordinal-group: 1 !important;
 }
 
-/* Adjust for fullscreen mode:
-   - Hide the tab toolbar completely.
-   - Remove the bottom margin from the browser content so it takes up the full screen.
-*/
+/* Adjust for fullscreen mode: */
 :root[inFullscreen] #TabsToolbar {
-  display: none !important; /* Hide the tab bar completely */
+  display: none !important;
 }
 
 :root[inFullscreen] #browser {
-  margin-bottom: 0 !important; /* Ensure browser content takes full height */
+  margin-bottom: 0 !important;
 }
 
 /* Hide the close button, targeting it through multiple potential parent elements */
