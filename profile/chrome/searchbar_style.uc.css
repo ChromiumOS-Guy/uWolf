@@ -66,3 +66,7 @@
 #bookmarks-menu-button {
   margin-left: auto !important; /* Pushes the button to the far right */
 }
+
+:root[inFullscreen] #nav-bar {
+  visibility: collapse !important;
+}

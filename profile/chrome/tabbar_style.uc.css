@@ -17,12 +17,11 @@
   --tab-bar-border-top: 1px; /* Variable for the border thickness */
   /* Calculate the effective height of the tab bar for use in other elements */
   --tab-bar-effective-height: calc(max(var(--tab-bar-min-height), min(var(--tab-bar-height), var(--tab-bar-max-height))));
-  --tab-effective-height: calc(var(--tab-bar-effective-height) - (0.5vh +1px)); /* Adjusted to reflect the new tab height */
+  --tab-effective-height: calc(var(--tab-bar-effective-height) - (0.5vh + 1px)); /* Adjusted to reflect the new tab height */
 
   /* Variables for the fixed left menu button space */
   --fixed-left-button-width: 60px; /* Estimate width of #PanelUI-menu-button */
   --fixed-left-button-offset: 10px; /* 'left' value of #PanelUI-menu-button */
-  --fixed-left-button-total-space: calc(var(--fixed-left-button-width) + var(--fixed-left-button-offset) + 10px); /* Total space needed on left, + some buffer */
 }
 
 /* Make the tab bar appear at the bottom */
@@ -40,11 +39,10 @@
   /* Use flexbox to arrange items horizontally */
   display: flex !important;
   align-items: center !important; /* Vertically center items */
-  justify-content: center !important; /* Center the overall group of flex items */
   box-sizing: border-box !important; /* Include padding in the element's total width/height */
 
   /* Add padding on the left to make space for the fixed #PanelUI-menu-button */
-  padding-left: var(--fixed-left-button-total-space) !important;
+  padding-left: max(25px, min(15px, 7vw)) !important;
   padding-right: 10px !important; /* General padding on the right */
 }
 
@@ -59,12 +57,9 @@
   padding-bottom: 0 !important;
 }
 
-/* Adjust the height of the individual tabs */
+/* Adjusted: This section is the key to fixing the snapping issue while keeping min/max widths */
 #TabsToolbar .tabbrowser-tab {
-  min-height: var(--tab-effective-height) !important; /* Updated */
-  max-height: var(--tab-effective-height) !important; /* Updated */
-  padding-inline: 20px !important;
-  line-height: var(--tab-effective-height) !important; /* Updated */
+
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -81,7 +76,7 @@
   overflow-x: auto !important; /* Allow tabs to scroll horizontally if they overflow */
   overflow-y: hidden !important;
   flex-grow: 1 !important; /* Allow tabs to take up available space */
-  justify-content: center !important; /* Center the tabs themselves within the available space */
+  /* Removed justify-content: center to allow tabs to fill the space */
 }
 
 /* Ensure tab content is centered */

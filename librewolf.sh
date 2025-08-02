@@ -24,7 +24,7 @@ import focus_monitor
 
 
 #### Functions
-def scalingdevidor(GRID_PX : int = int(os.environ["GRID_UNIT_PX"])) -> int:
+def scalingdevidor(GRID_PX : int = int(os.environ["GRID_UNIT_PX"])) -> int: # getprop vendor.display.lcd_density
   if GRID_PX >= 21: # seems to be what most need if above or at 21 grid px
     return 8
   elif GRID_PX <= 16: # this one i know because my phone is 16 so if it seems weird don't worry it works.
@@ -126,7 +126,7 @@ def is_usage_mode_staged() -> bool:
   return False # if check fails then its not Staged
 
 #### GLOBAL VARIABLES
-scaling = str(max(0.7, min(float(os.environ["GRID_UNIT_PX"])/scalingdevidor(), 2.4)))
+scaling = str(max(0.7, min(float(os.environ["GRID_UNIT_PX"])/scalingdevidor(), 2.4))) # cap at 2.4max and 0.7min so avoid croping issues.
 
 #### profile stuff
 system_var_dict = {

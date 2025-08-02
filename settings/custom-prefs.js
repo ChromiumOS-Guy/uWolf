@@ -31,7 +31,7 @@ pref('network.http.max-connections-per-server', 30); // max http(s) connections 
 
 
 // website rendering
-pref("general.useragent.override", "Mozilla/5.0 (Android 14; Mobile; rv:136.0) Gecko/136.0 Firefox/136.0"); // make website render for mobile
+pref("general.useragent.override", "Mozilla/5.0 (Linux; Mobile; Ubuntu 20.04 like Android 9) Firefox/140.0.2-1"); // make website render for mobile
 pref('content.notify.backoffcount', 5); // reflow adjustment
 pref('content.notify.interval', 849999); // minimum time between reflows
 pref('content.interrupt.parsing', true); // enables content parsing
