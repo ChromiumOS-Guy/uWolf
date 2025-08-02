@@ -160,7 +160,6 @@ scaling = str(max(0.7, min(float(get_lcd_density()/240), 2.4))) # cap at 2.4max 
 
 #### profile stuff
 system_var_dict = {
-  "scaling" : scaling,
   "is-tablet" : is_tablet() # 0 for phone 1 for tablet
 }
 profile = profile.get_librewolf_default_profile() # get default profile

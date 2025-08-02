@@ -2,108 +2,190 @@ import subprocess
 import os
 import re
 
-def get_OSK_data():
-    """
-    Runs a QML file as a subprocess, captures its console output,
-    and terminates the subprocess when '%QUIT%' is encountered.
-    Captures lines containing 'calculatedPortraitOSKHeight' and
-    'calculatedLandscapeOSKHeight'.
 
-    Returns:
-        list: A list of captured lines containing the specified keywords.
-    """
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    keyboard_qml_path = os.path.join(script_dir, "keyboard.qml")
+def is_wordribbon_enabled() -> bool:
+  # gesttings get com.lomiri.Shell usage-mode
+  spellchecking = None
+  predictivetext = None
+  process = None
+  try:
+    # Start the QML process, capturing stdout
+    process = subprocess.Popen(
+        ["gsettings", "get", "com.lomiri.keyboard.maliit", "spell-checking"],
+        stdout=subprocess.PIPE,
+        text=True,  # Decode output as text
+        bufsize=1,  # Line-buffered output
+        universal_newlines=True # Ensure consistent newline handling
+    )
 
-    if not os.path.exists(keyboard_qml_path):
-        print(f"Error: keyboard.qml not found")
-        return [] # Return an empty list if file not found
+    spellchecking = process.stdout.readline().strip()
 
-    print(f"Running QML file: keyboard.qml")
-    print("-" * 30)
+    process = subprocess.Popen(
+        ["gsettings", "get", "com.lomiri.keyboard.maliit", "predictive-text"],
+        stdout=subprocess.PIPE,
+        text=True,  # Decode output as text
+        bufsize=1,  # Line-buffered output
+        universal_newlines=True # Ensure consistent newline handling
+    )
 
+    predictivetext = process.stdout.readline().strip()
+
+  except Exception as e:
+    print(f"An error occurred: {e}")
+  finally:
+    if process and process.poll() is None:  # Check if the process is still running
+        print("Killing process...")
+        process.terminate()  # Send a terminate signal
+        try:
+          process.wait(timeout=5)  # Wait for the process to terminate
+        except subprocess.TimeoutExpired:
+          print("Process did not terminate gracefully, killing it.")
+          process.kill()  # Force kill if termination fails
+
+  if spellchecking == "true" or spellchecking == None or predictivetext == "true" or predictivetext == None: # check if true, fallback if nothing was outputed to least UI breaking.
+    return True
+  return False # if check fails then its enabled
+
+def get_vertical_resolution() -> int:
+    # getprop vendor.display.lcd_density
+    vertical_resolution = None
     process = None
-    captured_lines = []  # Initialize an empty list to store the captured lines
-
     try:
         # Start the QML process, capturing stdout
-        process = subprocess.Popen(
-            ["qmlscene", keyboard_qml_path],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,  # Redirect stderr to stdout to capture all output
-            text=True,  # Decode output as text
-            bufsize=1,  # Line-buffered output
-            universal_newlines=True # Ensure consistent newline handling
+        process = subprocess.run(
+            "cat /sys/class/drm/card0-DSI-1/modes | awk -F 'x' '{print $2}' | sort -u",
+            shell=True,
+            check=True,
+            capture_output=True,
+            text=True
         )
+        vertical_resolution = int(process.stdout.strip())
 
-        for line in process.stdout:
-            print(f"QML Output: {line.strip()}")
-            # Check if the line contains either of the keywords
-            if "calculatedOSK" in line:
-                captured_lines.append(line.strip())  # Add the stripped line to the list
-            if "%QUIT%" in line:
-                print("\n%QUIT% detected. Terminating QML process.")
-                break
-
-    except FileNotFoundError:
-        print(f"Error: 'qmlscene' not found. "
-              "Please ensure QML runtime is installed and in your system's PATH, "
-              "or provide the full path to the executable.")
+    except process.CalledProcessError as e:
+        # This handles errors if any command in the pipeline fails.
+        print(f"Command failed with return code {e.returncode}:")
+        print(e.stderr)
+        return 0
+    except FileNotFoundError as e:
+        print(f"Error: A command in the pipeline was not found. Details: {e}")
+        return 0
     except Exception as e:
-        print(f"An error occurred: {e}")
-    finally:
-        if process and process.poll() is None:  # Check if the process is still running
-            print("Killing QML process...")
-            process.terminate()  # Send a terminate signal
-            try:
-                process.wait(timeout=5)  # Wait for the process to terminate
-            except subprocess.TimeoutExpired:
-                print("Process did not terminate gracefully, killing it.")
-                process.kill()  # Force kill if termination fails
-        print("-" * 30)
-        print("QML process finished.")
+        print(f"An unexpected error occurred: {e}")
+        return 0
+  
+    return vertical_resolution
 
-    return clean_output(captured_lines)
+def get_horizontal_resolution() -> int:
+    # getprop vendor.display.lcd_density
+    horizontal_resolution = None
+    process = None
+    try:
+        # Start the QML process, capturing stdout
+        process = subprocess.run(
+            "cat /sys/class/drm/card0-DSI-1/modes | awk -F 'x' '{print $1}' | sort -u",
+            shell=True,
+            check=True,
+            capture_output=True,
+            text=True
+        )
+        horizontal_resolution = int(process.stdout.strip())
 
-def clean_output(captured_lines: list) -> dict:
+    except process.CalledProcessError as e:
+        # This handles errors if any command in the pipeline fails.
+        print(f"Command failed with return code {e.returncode}:")
+        print(e.stderr)
+        return 0
+    except FileNotFoundError as e:
+        print(f"Error: A command in the pipeline was not found. Details: {e}")
+        return 0
+        
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return 0
+  
+    return horizontal_resolution
+
+def get_keyboard_heights() -> dict:
     """
-    Cleans a list of strings in the format "qml: key: value" and
-    returns a dictionary with keys as strings and values as floats.
-    Uses regular expressions for more robust parsing.
-
-    Args:
-        captured_lines: A list of strings, e.g.,
-                        ['qml: calculatedPortraitOSKHeight: 640.00',
-                         'qml: calculatedLandscapeOSKHeight: 352.80']
+    Reads a JavaScript file and extracts specific keyboard height variables into a dictionary.
 
     Returns:
-        A dictionary, e.g.,
-        {
-            "calculatedPortraitOSKHeight": 640.00,
-            "calculatedLandscapeOSKHeight": 352.80
-        }
+        A dictionary containing the extracted keyboard height values.
+        Returns an empty dictionary if the file cannot be read or variables are not found.
     """
-    if not captured_lines:
+    keyboard_heights = {}
+    file_path = "/usr/share/maliit/plugins/lomiri-keyboard/keys/key_constants.js"
+
+    # The variables we want to extract
+    variables_to_find = [
+        "tabletWordribbonHeight",
+        "phoneWordribbonHeight",
+        "phoneKeyboardHeightPortrait",
+        "tabletKeyboardHeightLandscape",
+        "phoneKeyboardHeightLandscape",
+        "tabletKeyboardHeightPortrait"
+    ]
+
+    try:
+        with open(file_path, 'r') as f:
+            content = f.read()
+    except FileNotFoundError:
+        print(f"Error: The file {file_path} was not found.")
+        return {}
+    except Exception as e:
+        print(f"An error occurred while reading the file: {e}")
         return {}
 
-    cleaned_data = {}
-    # Regex to capture the key (anything after "qml: " and before the last ":")
-    # and the float value (digits, optional dot, optional more digits)
-    # It handles optional spaces around the colon and after "qml:".
-    pattern = re.compile(r"qml:\s*(.*?):\s*(\d+\.?\d*)")
-
-    for line in captured_lines:
-        match = pattern.search(line)
+    for var_name in variables_to_find:
+        # We use a regular expression to find the variable and its value.
+        # The pattern looks for 'var', the variable name, '=', and then captures the number.
+        # It handles both integers and floats.
+        pattern = rf'var\s+{re.escape(var_name)}\s*=\s*([0-9.]+);'
+        match = re.search(pattern, content)
         if match:
-            key = match.group(1).strip()
-            value_str = match.group(2).strip()
+            # We try to convert the matched string to a float.
+            # If it's a whole number, it will be an integer.
             try:
-                value = float(value_str)
-                cleaned_data[key] = value
-            except ValueError:
-                # This should ideally not happen if the regex correctly
-                # captures only numeric strings, but it's good practice.
-                print(f"Warning: Could not convert '{value_str}' to float for key '{key}'")
-        else:
-            print(f"Warning: Line did not match expected format: '{line}'")
-    return cleaned_data
+                value_str = match.group(1)
+                if '.' in value_str:
+                    keyboard_heights[var_name] = float(value_str)
+                else:
+                    keyboard_heights[var_name] = int(value_str)
+            except (ValueError, IndexError) as e:
+                print(f"Could not parse value for {var_name}: {e}")
+                continue
+    
+    return keyboard_heights
+
+
+def get_OSK_data() -> dict:
+    keyboard_heights = get_keyboard_heights()
+    vertical_resolution = get_vertical_resolution()
+    horizontal_resolution = get_horizontal_resolution()
+    print(horizontal_resolution,vertical_resolution)
+    Phonewordribbon = 0
+    Tabletwordribbon = 0
+    output_dict = { # fallback in case it doesn't work, will use my phone's values with wordribbon ON.
+        "calculated-o-s-kphone-portrait-height" : 704.0,
+        "calculated-o-s-ktablet-portrait-height" : 592.0,
+        "calculated-o-s-kphone-landscape-height" : 474.4,
+        "calculated-o-s-ktablet-landscape-height" : 434.4
+    }
+
+    try:
+        if is_wordribbon_enabled():
+            Phonewordribbon = int(keyboard_heights["phoneWordribbonHeight"]) * int(os.environ["GRID_UNIT_PX"])
+            Tabletwordribbon = int(keyboard_heights["tabletWordribbonHeight"]) * int(os.environ["GRID_UNIT_PX"])
+
+        output_dict = {
+            "calculated-o-s-kphone-portrait-height" : (float(keyboard_heights["phoneKeyboardHeightPortrait"]) * vertical_resolution) - Phonewordribbon, # we are removing the height of wordribbon because CSS implementation was easier this way
+            "calculated-o-s-ktablet-portrait-height" : (float(keyboard_heights["tabletKeyboardHeightPortrait"]) * vertical_resolution) - Tabletwordribbon,
+            "calculated-o-s-kphone-landscape-height" : (float(keyboard_heights["phoneKeyboardHeightLandscape"]) * horizontal_resolution) - Phonewordribbon,
+            "calculated-o-s-ktablet-landscape-height" : (float(keyboard_heights["tabletKeyboardHeightLandscape"]) * horizontal_resolution) - Tabletwordribbon
+        }
+    except TypeError:
+        # This block only runs if a TypeError occurs in the 'try' block.
+        print("Error: You cannot add a number and a string together.")
+
+
+    return output_dict
