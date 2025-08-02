@@ -42,7 +42,7 @@
   box-sizing: border-box !important; /* Include padding in the element's total width/height */
 
   /* Add padding on the left to make space for the fixed #PanelUI-menu-button */
-  padding-left: max(25px, min(15px, 7vw)) !important;
+  padding-left: max(var(--fixed-left-button-width), min(var(--fixed-left-button-width), var(--fixed-left-button-width) + 5vw)) !important;
   padding-right: 10px !important; /* General padding on the right */
 }
 

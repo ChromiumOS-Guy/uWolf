@@ -24,15 +24,44 @@ import focus_monitor
 
 
 #### Functions
-def scalingdevidor(GRID_PX : int = int(os.environ["GRID_UNIT_PX"])) -> int: # getprop vendor.display.lcd_density
-  if GRID_PX >= 21: # seems to be what most need if above or at 21 grid px
-    return 8
-  elif GRID_PX <= 16: # this one i know because my phone is 16 so if it seems weird don't worry it works.
-    return 12
-  else: # throw in the dark but lets hope it works
-    return 10
+def get_lcd_density() -> int:
+  # getprop vendor.display.lcd_density
+  lcd_density = None
+  process = None
+  try:
+    # Start the QML process, capturing stdout
+    process = subprocess.Popen(
+        ["getprop", "vendor.display.lcd_density"],
+        stdout=subprocess.PIPE,
+        text=True,  # Decode output as text
+        bufsize=1,  # Line-buffered output
+        universal_newlines=True # Ensure consistent newline handling
+    )
+    lcd_density = int(process.stdout.readline().strip())
 
-def is_tablet() -> int:
+  except Exception as e:
+    print(f"An error occurred: {e}")
+  finally:
+    if process and process.poll() is None:  # Check if the process is still running
+        print("Killing process...")
+        process.terminate()  # Send a terminate signal
+        try:
+          process.wait(timeout=5)  # Wait for the process to terminate
+        except subprocess.TimeoutExpired:
+          print("Process did not terminate gracefully, killing it.")
+          process.kill()  # Force kill if termination fails
+  
+  return lcd_density
+
+# def scalingdevidor(GRID_PX : int = int(os.environ["GRID_UNIT_PX"])) -> int: # getprop vendor.display.lcd_density
+#   if GRID_PX >= 21: # seems to be what most need if above or at 21 grid px
+#     return 8
+#   elif GRID_PX <= 16: # this one i know because my phone is 16 so if it seems weird don't worry it works.
+#     return 12
+#   else: # throw in the dark but lets hope it works
+#     return 10
+
+def is_tablet() -> int: # apparmor is being annoying this won't work need a redesign
   process = None
   try:
     yaml_path = "/etc/deviceinfo/devices/halium.yaml" # will be use as fallback if device is not native device.
@@ -101,13 +130,13 @@ def is_usage_mode_staged() -> bool:
   try:
     # Start the QML process, capturing stdout
     process = subprocess.Popen(
-        "gsettings get com.lomiri.Shell usage-mode",
+        ["gsettings", "get", "com.lomiri.Shell", "usage-mode"],
         stdout=subprocess.PIPE,
         text=True,  # Decode output as text
         bufsize=1,  # Line-buffered output
         universal_newlines=True # Ensure consistent newline handling
     )
-    usage_mode = process.stdout[0]
+    usage_mode = process.stdout.readline().strip()
 
   except Exception as e:
     print(f"An error occurred: {e}")
@@ -121,12 +150,13 @@ def is_usage_mode_staged() -> bool:
           print("Process did not terminate gracefully, killing it.")
           process.kill()  # Force kill if termination fails
 
-  if usage_mode == "Staged" or usage_mode == None: # check if staged, fallback if nothing was outputed to most likely.
+  if usage_mode == r"'Staged'" or usage_mode == None: # check if staged, fallback if nothing was outputed to most likely.
     return True
   return False # if check fails then its not Staged
 
 #### GLOBAL VARIABLES
-scaling = str(max(0.7, min(float(os.environ["GRID_UNIT_PX"])/scalingdevidor(), 2.4))) # cap at 2.4max and 0.7min so avoid croping issues.
+# scaling = str(max(0.7, min(float(os.environ["GRID_UNIT_PX"])/scalingdevidor(), 2.4))) # cap at 2.4max and 0.7min so avoid croping issues.
+scaling = str(max(0.7, min(float(get_lcd_density()/240), 2.4))) # cap at 2.4max and 0.7min so avoid croping issues. (DPI Scaling)
 
 #### profile stuff
 system_var_dict = {
