@@ -5,7 +5,7 @@ this is still in early development, help welcome!
 
 It's important to note that without full hardware acceleration, performance isn't stellar, but it's generally good enough for basic Browse without heavy demands.
 
-Youtube Short Demo: https://youtube.com/shorts/8IigTL3g1t8
+Youtube Short Demo: https://youtube.com/shorts/BcV9cN1zmVU
 
 ## Setup:
 The setup process is straightforward:
