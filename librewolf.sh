@@ -179,7 +179,7 @@ if is_usage_mode_staged():
       print("Failed to initialize D-Bus monitor thread.")
 else:
   chrome.delete(profile) # attempt to delete custom chrome files, so browser works unmodifed
-  librewolf_overrides.copy_librewolf_overrides_cfg(profile, False) # copy librewolf settings overrides (False on Staged mode)
+  librewolf_overrides.copy_librewolf_overrides_cfg(profile, False) # copy librewolf settings overrides (True if Staged mode)
 
 
 #### librewolf stuff

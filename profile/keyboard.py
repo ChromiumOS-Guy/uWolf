@@ -4,7 +4,7 @@ import re
 
 
 def is_wordribbon_enabled() -> bool:
-  # gesttings get com.lomiri.Shell usage-mode
+  # gesttings get com.lomiri.keyboard.maliit spell-checking/predictive-text
   spellchecking = None
   predictivetext = None
   process = None
@@ -159,29 +159,24 @@ def get_keyboard_heights() -> dict:
 
 
 def get_OSK_data() -> dict:
-    keyboard_heights = get_keyboard_heights()
+    keyboard_heights = get_keyboard_heights() # a dict with the corresponding keyboard height values.
     vertical_resolution = get_vertical_resolution()
     horizontal_resolution = get_horizontal_resolution()
-    print(horizontal_resolution,vertical_resolution)
     Phonewordribbon = 0
     Tabletwordribbon = 0
-    output_dict = { # fallback in case it doesn't work, will use my phone's values with wordribbon ON.
-        "calculated-o-s-kphone-portrait-height" : 704.0,
-        "calculated-o-s-ktablet-portrait-height" : 592.0,
-        "calculated-o-s-kphone-landscape-height" : 474.4,
-        "calculated-o-s-ktablet-landscape-height" : 434.4
-    }
+    buffer = 5 # we want some overshoot to account for variance intreduced by CSS flexboxs. (5px is a good amount)
+    output_dict = {}
 
     try:
-        if is_wordribbon_enabled():
+        if is_wordribbon_enabled(): # grid_units * grid_unit_px = length in pixels
             Phonewordribbon = int(keyboard_heights["phoneWordribbonHeight"]) * int(os.environ["GRID_UNIT_PX"])
             Tabletwordribbon = int(keyboard_heights["tabletWordribbonHeight"]) * int(os.environ["GRID_UNIT_PX"])
 
         output_dict = {
-            "calculated-o-s-kphone-portrait-height" : (float(keyboard_heights["phoneKeyboardHeightPortrait"]) * vertical_resolution) - Phonewordribbon, # we are removing the height of wordribbon because CSS implementation was easier this way
-            "calculated-o-s-ktablet-portrait-height" : (float(keyboard_heights["tabletKeyboardHeightPortrait"]) * vertical_resolution) - Tabletwordribbon,
-            "calculated-o-s-kphone-landscape-height" : (float(keyboard_heights["phoneKeyboardHeightLandscape"]) * horizontal_resolution) - Phonewordribbon,
-            "calculated-o-s-ktablet-landscape-height" : (float(keyboard_heights["tabletKeyboardHeightLandscape"]) * horizontal_resolution) - Tabletwordribbon
+            "calculated-o-s-kphone-portrait-height" : (float(keyboard_heights["phoneKeyboardHeightPortrait"]) * vertical_resolution) - Phonewordribbon - buffer, # we are removing the height of wordribbon because CSS implementation was easier to do inverted.
+            "calculated-o-s-ktablet-portrait-height" : (float(keyboard_heights["tabletKeyboardHeightPortrait"]) * vertical_resolution) - Tabletwordribbon - buffer,
+            "calculated-o-s-kphone-landscape-height" : (float(keyboard_heights["phoneKeyboardHeightLandscape"]) * horizontal_resolution) - Phonewordribbon - buffer,
+            "calculated-o-s-ktablet-landscape-height" : (float(keyboard_heights["tabletKeyboardHeightLandscape"]) * horizontal_resolution) - Tabletwordribbon - buffer
         }
     except TypeError:
         # This block only runs if a TypeError occurs in the 'try' block.
