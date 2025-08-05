@@ -62,67 +62,39 @@ def scalingdevidor(GRID_PX : int = int(os.environ["GRID_UNIT_PX"])) -> int: # ge
   else: # throw in the dark but lets hope it works
     return 10
 
-def is_tablet() -> int: # apparmor is being annoying this won't work need a redesign
-  process = None
-  try:
-    yaml_path = "/etc/deviceinfo/devices/halium.yaml" # will be use as fallback if device is not native device.
-    process = subprocess.Popen(
-        "getprop ro.product.name",
-        stdout=subprocess.PIPE,
-        text=True,  # Decode output as text
-        bufsize=1,  # Line-buffered output
-        universal_newlines=True # Ensure consistent newline handling
-    )
 
-    # Read the first line of stdout and strip whitespace
-    devicename_raw = process.stdout.readline().strip()
+def is_tablet() -> int:
+    # getprop vendor.display.lcd_density
+    devicetype = None
+    process = None
+    try:
+        # Start the QML process, capturing stdout
+        process = subprocess.run(
+            "device-info | awk -F': ' '/DeviceType:/ {print $2}'",
+            shell=True,
+            check=True,
+            capture_output=True,
+            text=True
+        )
+        devicetype = process.stdout.strip()
+
+    except process.CalledProcessError as e:
+        # This handles errors if any command in the pipeline fails.
+        print(f"Command failed with return code {e.returncode}:")
+        print(e.stderr)
+        return 0 # fallback to phone
+    except FileNotFoundError as e:
+        print(f"Error: A command in the pipeline was not found. Details: {e}")
+        return 0 # fallback to phone
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return 0 # fallback to phone
     
-    # Normalize devicename
-    devicename_normalized = devicename_raw.lower().replace(" ", "").replace("-", "").replace("_", "") # Added _ as well
+    if devicetype == "tablet":
+      return 1
+    else:
+      return 0
 
-    all_entries = os.listdir("/etc/deviceinfo/devices/")
-
-    print("\nComparing device name with filenames in /etc/deviceinfo/devices/:")
-    for entry in all_entries:
-      filename_without_ext = os.path.splitext(entry)[0]
-      filename_normalized = filename_without_ext.lower().replace(" ", "").replace("-", "").replace("_", "") # Added _ as well
-      if devicename_normalized == filename_normalized: # check if device is native and if so, use its deviceinfo yaml
-        yaml_path = os.path.join("/etc/deviceinfo/devices", entry)
-        break
-
-    with open(yaml_path, 'r') as file:
-      yaml_data = yaml.safe_load(file) # pull deviceinfo
-      if not yaml_data:
-        print("Error: {path} is empty (no attribute items).".format(path=yaml_path))
-        print("Defaulting to phone, as to not completely break UI.")
-        return 0 # phone
-      for device, info in yaml_data.items():
-        if info.get("DeviceType") != 'phone': # check if its a phone or not
-          return 1 # tablet
-  
-  except yaml.YAMLError as e: # implement fallback to most likely option incase there is an error
-    print(f"Error parsing YAML: {e}")
-    print("Defaulting to phone, as to not completely break UI.")
-  
-  except FileNotFoundError:
-    print("Error: /etc/deviceinfo/devices/halium.yaml not found.")
-    print("Defaulting to phone, as to not completely break UI.")
-  
-  except Exception as e:
-    print(f"An error occurred: {e}")
-    print("Defaulting to phone, as to not completely break UI.")
-  
-  finally:
-    if process and process.poll() is None:  # Check if the process is still running
-        print("Killing process...")
-        process.terminate()  # Send a terminate signal
-        try:
-          process.wait(timeout=5)  # Wait for the process to terminate
-        except subprocess.TimeoutExpired:
-          print("Process did not terminate gracefully, killing it.")
-          process.kill()  # Force kill if termination fails
-  
-  return 0 # phone
 
 def is_usage_mode_staged() -> bool:
   # gesttings get com.lomiri.Shell usage-mode
@@ -155,6 +127,7 @@ def is_usage_mode_staged() -> bool:
     return True
   return False # if check fails then its not Staged
 
+
 #### GLOBAL VARIABLES
 scaling = 1.5
 if get_lcd_density() == 0:
@@ -163,6 +136,7 @@ if get_lcd_density() == 0:
 else:
   scaling = str(max(0.7, min(float(get_lcd_density()/240), 2.4))) # cap at 2.4max and 0.7min so avoid croping issues. (DPI Scaling)
 
+
 #### profile stuff
 system_var_dict = {
   "is-tablet" : is_tablet() # 0 for phone 1 for tablet
@@ -170,6 +144,7 @@ system_var_dict = {
 profile = profile.get_librewolf_default_profile() # get default profile
 dbus_monitor_thread = None
 dbus_stop_event = None
+
 if is_usage_mode_staged():
   chrome.INIT_CHROME(profile, system_var_dict) # copy custom css for adapting UI to default profile and read keyboard
   librewolf_overrides.copy_librewolf_overrides_cfg(profile) # copy librewolf settings overrides

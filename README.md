@@ -25,7 +25,6 @@ if the browser is too small or too big please send me the output of this:
 * No hardware acceleration (fix coming with mir2.x subsurface support on Noble)
 * Opening uwolf from url dispatcher crashes uwolf, this also affects opening from openstore. (fix coming with mir2.x subsurface support on Noble)
 * Seperate Clipboard (copy/paste) then rest of system (fix coming with mir2.x subsurface support on Noble)
-* it_tablet() function is getting blocked by apparmor so uWolf alaways assumes it runs on a phone.
 
 * #### LANDSCAPE Issues:
     * Inputs on the right side of the screen do not work in landscape mode (fix coming when [this](https://gitlab.com/ubports/development/core/lomiri/-/merge_requests/207) is merged)
