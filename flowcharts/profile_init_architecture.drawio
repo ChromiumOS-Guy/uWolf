@@ -1,139 +1,141 @@
 <mxfile host="65bd71144e">
     <diagram id="nbfTAc3BsVZHMYUAhAVt" name="Page-1">
-        <mxGraphModel dx="1834" dy="531" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1425" dy="275" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="14" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="2" target="13">
+                <mxCell id="14" value="" style="edgeStyle=none;html=1;" parent="1" source="2" target="13" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="25" value="gets profile&lt;br&gt;folder path" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="14">
+                <mxCell id="25" value="gets profile&lt;br&gt;folder path" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="14" vertex="1" connectable="0">
                     <mxGeometry x="0.1862" relative="1" as="geometry">
                         <mxPoint x="11" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="2" value="profile.py" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="2" value="profile.py" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="680" y="120" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="3" value="chrome.py" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="3" value="chrome.py" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="320" y="240" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="17" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="4" target="8">
+                <mxCell id="17" value="" style="edgeStyle=none;html=1;" parent="1" source="4" target="8" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="30" value="copies config override&lt;br&gt;to .librewolf directory" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="17">
+                <mxCell id="30" value="copies config override&lt;br&gt;to .librewolf directory" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" parent="17" vertex="1" connectable="0">
                     <mxGeometry x="-0.3698" y="1" relative="1" as="geometry">
                         <mxPoint x="-1" y="8" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="4" value="librewolf_overrides.py" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="4" value="librewolf_overrides.py" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="560" y="240" width="130" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="23" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="5" target="3">
+                <mxCell id="23" value="" style="edgeStyle=none;html=1;" parent="1" source="5" target="3" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="32" value="communicates&lt;br&gt;OSK height in px" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="23">
+                <mxCell id="32" value="communicates&lt;br&gt;OSK height in px" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" parent="23" vertex="1" connectable="0">
                     <mxGeometry x="-0.2221" y="-1" relative="1" as="geometry">
                         <mxPoint x="13" y="-1" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="34" value="" style="edgeStyle=none;html=1;fontSize=11;" edge="1" parent="1" source="5" target="6">
+                <mxCell id="51" value="" style="edgeStyle=none;html=1;fontSize=12;" edge="1" parent="1" source="5" target="50">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="35" value="gets OSK height in pixels" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="34">
-                    <mxGeometry x="-0.208" relative="1" as="geometry">
-                        <mxPoint y="-7" as="offset"/>
+                <mxCell id="52" value="check if wrodribbon is enabled" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=12;" vertex="1" connectable="0" parent="51">
+                    <mxGeometry x="-0.2" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <UserObject label="keyboard.py" link="keyboard.py" id="5">
-                    <mxCell style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                        <mxGeometry x="80" y="240" width="120" height="60" as="geometry"/>
+                    <mxCell style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                        <mxGeometry x="20" y="240" width="120" height="60" as="geometry"/>
                     </mxCell>
                 </UserObject>
-                <mxCell id="38" value="" style="edgeStyle=none;html=1;fontSize=10;" edge="1" parent="1" source="6" target="36">
-                    <mxGeometry relative="1" as="geometry"/>
+                <mxCell id="38" value="" style="edgeStyle=none;html=1;fontSize=10;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="5" target="36" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="80" y="120" as="sourcePoint"/>
+                    </mxGeometry>
                 </mxCell>
-                <mxCell id="39" value="gets OSK height in&lt;br&gt;screen percentile" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;" vertex="1" connectable="0" parent="38">
+                <mxCell id="39" value="gets OSK height in&lt;br&gt;screen percentile&lt;br&gt;and wordribbon height in grid units." style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;" parent="38" vertex="1" connectable="0">
                     <mxGeometry x="-0.3" relative="1" as="geometry">
                         <mxPoint y="-9" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="41" value="" style="edgeStyle=none;html=1;fontSize=10;" edge="1" parent="1" source="6" target="40">
-                    <mxGeometry relative="1" as="geometry"/>
+                <mxCell id="41" value="" style="edgeStyle=none;html=1;fontSize=10;" parent="1" source="5" target="40" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="20" y="150" as="sourcePoint"/>
+                    </mxGeometry>
                 </mxCell>
-                <mxCell id="42" value="gets screen height" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;" vertex="1" connectable="0" parent="41">
+                <mxCell id="42" value="gets screen height" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;" parent="41" vertex="1" connectable="0">
                     <mxGeometry x="-0.1879" y="1" relative="1" as="geometry">
                         <mxPoint x="-10" y="-1" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <UserObject label="keyboard.qml" link="keyboard.qml" id="6">
-                    <mxCell style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                        <mxGeometry x="80" y="120" width="120" height="60" as="geometry"/>
-                    </mxCell>
-                </UserObject>
-                <mxCell id="8" value="librewolf.overrides.cfg/&lt;br&gt;librewolf.overrides.cfg.notstaged" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="8" value="librewolf.overrides.cfg/&lt;br&gt;librewolf.overrides.cfg.notstaged" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="525" y="370" width="200" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="18" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="13" target="3">
+                <mxCell id="18" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="13" target="3" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="27" value="transfers profile path,&amp;nbsp;&lt;span style=&quot;color: rgb(220, 220, 170); background-color: rgb(31, 31, 31); font-family: &amp;quot;Droid Sans Mono&amp;quot;, &amp;quot;monospace&amp;quot;, monospace;&quot;&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;is_tablet&amp;nbsp;&lt;br&gt;&lt;/font&gt;&lt;/span&gt;and scaling.&lt;br&gt;runs&amp;nbsp;&lt;span style=&quot;color: rgb(220, 220, 170); background-color: rgb(31, 31, 31); font-family: &amp;quot;Droid Sans Mono&amp;quot;, &amp;quot;monospace&amp;quot;, monospace;&quot;&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;INIT_CHROME&lt;/font&gt;&lt;/span&gt;&amp;nbsp;only if staged" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="18">
+                <mxCell id="27" value="transfers profile path,&amp;nbsp;&lt;span style=&quot;color: rgb(220, 220, 170); background-color: rgb(31, 31, 31); font-family: &amp;quot;Droid Sans Mono&amp;quot;, &amp;quot;monospace&amp;quot;, monospace;&quot;&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;is_tablet&amp;nbsp;&lt;br&gt;&lt;/font&gt;&lt;/span&gt;and scaling.&lt;br&gt;runs&amp;nbsp;&lt;span style=&quot;color: rgb(220, 220, 170); background-color: rgb(31, 31, 31); font-family: &amp;quot;Droid Sans Mono&amp;quot;, &amp;quot;monospace&amp;quot;, monospace;&quot;&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;INIT_CHROME&lt;/font&gt;&lt;/span&gt;&amp;nbsp;only if staged" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="18" vertex="1" connectable="0">
                     <mxGeometry x="-0.206" y="-2" relative="1" as="geometry">
                         <mxPoint x="-6" y="8" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="19" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="13" target="4">
+                <mxCell id="19" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="13" target="4" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="26" value="transfers profile path&lt;br&gt;and if device is in staged mode" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="19">
+                <mxCell id="26" value="transfers profile path&lt;br&gt;and if device is in staged mode" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="19" vertex="1" connectable="0">
                     <mxGeometry x="-0.199" y="2" relative="1" as="geometry">
                         <mxPoint x="19" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="28" style="edgeStyle=none;html=1;entryX=0;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="13" target="3">
+                <mxCell id="28" style="edgeStyle=none;html=1;entryX=0;entryY=0;entryDx=0;entryDy=0;" parent="1" source="13" target="3" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="320" y="150"/>
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="29" value="runs&amp;nbsp;&lt;span style=&quot;color: rgb(220, 220, 170); background-color: rgb(31, 31, 31); font-family: &amp;quot;Droid Sans Mono&amp;quot;, &amp;quot;monospace&amp;quot;, monospace;&quot;&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;delete&lt;/font&gt;&lt;/span&gt;&amp;nbsp;chrome if not staged" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="28">
+                <mxCell id="29" value="runs&amp;nbsp;&lt;span style=&quot;color: rgb(220, 220, 170); background-color: rgb(31, 31, 31); font-family: &amp;quot;Droid Sans Mono&amp;quot;, &amp;quot;monospace&amp;quot;, monospace;&quot;&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;delete&lt;/font&gt;&lt;/span&gt;&amp;nbsp;chrome if not staged" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="28" vertex="1" connectable="0">
                     <mxGeometry x="-0.1342" y="-1" relative="1" as="geometry">
                         <mxPoint x="-15" y="21" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="44" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=12;" edge="1" parent="1" source="13" target="43">
+                <mxCell id="44" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=12;" parent="1" source="13" target="43" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="45" value="get usage mode" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=12;" vertex="1" connectable="0" parent="44">
+                <mxCell id="45" value="get usage mode" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=12;" parent="44" vertex="1" connectable="0">
                     <mxGeometry x="0.2709" relative="1" as="geometry">
                         <mxPoint x="-2" y="8" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="47" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=12;" edge="1" parent="1" source="13" target="46">
+                <mxCell id="47" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=12;" parent="1" source="13" target="46" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="48" value="check device type&lt;br&gt;(phone/tablet)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=12;" vertex="1" connectable="0" parent="47">
+                <mxCell id="48" value="check device type&lt;br&gt;(phone/tablet)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=12;" parent="47" vertex="1" connectable="0">
                     <mxGeometry x="-0.264" relative="1" as="geometry">
                         <mxPoint x="6" y="-8" as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <UserObject label="librewolf.sh" link="librewolf.sh" id="13">
-                    <mxCell style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxCell style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                         <mxGeometry x="450" y="120" width="120" height="60" as="geometry"/>
                     </mxCell>
                 </UserObject>
-                <mxCell id="36" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: &amp;quot;Droid Sans Mono&amp;quot;, &amp;quot;monospace&amp;quot;, monospace; font-weight: normal; line-height: 19px;&quot;&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;/usr/share/maliit/plugins/lomiri-keyboard/keys/key_constants.js&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
-                    <mxGeometry x="25" width="230" height="60" as="geometry"/>
+                <mxCell id="36" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: &amp;quot;Droid Sans Mono&amp;quot;, &amp;quot;monospace&amp;quot;, monospace; font-weight: normal; line-height: 19px;&quot;&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;/usr/share/maliit/plugins/lomiri-keyboard/keys/key_constants.js&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="-35" y="100" width="230" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="40" value="Qt framework" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
-                    <mxGeometry x="-150" y="120" width="120" height="60" as="geometry"/>
+                <mxCell id="40" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: &amp;quot;Droid Sans Mono&amp;quot;, &amp;quot;monospace&amp;quot;, monospace; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;/sys/class/drm/card0-DSI-1/modes&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="-260" y="240" width="169.67" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="43" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;gsettings&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" vertex="1" parent="1">
+                <mxCell id="43" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;gsettings&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;" parent="1" vertex="1">
                     <mxGeometry x="340" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="46" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: &amp;quot;Droid Sans Mono&amp;quot;, &amp;quot;monospace&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #ce9178;&quot;&gt;/etc/deviceinfo/devices/*&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;" vertex="1" parent="1">
-                    <mxGeometry x="540" width="230" height="60" as="geometry"/>
+                <mxCell id="46" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: &amp;quot;Droid Sans Mono&amp;quot;, &amp;quot;monospace&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;/div&gt;&lt;span style=&quot;color: rgb(206, 145, 120); background-color: rgb(31, 31, 31); font-family: &amp;quot;Droid Sans Mono&amp;quot;, &amp;quot;monospace&amp;quot;, monospace; font-size: 14px;&quot;&gt;/etc/deviceinfo/devices/*&lt;/span&gt;&amp;nbsp;using (device-info command)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="560" y="10" width="250" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="50" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: &amp;quot;Droid Sans Mono&amp;quot;, &amp;quot;monospace&amp;quot;, monospace; font-weight: normal; line-height: 19px;&quot;&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;gesttings get com.lomiri.keyboard.maliit spell-checking/predictive-text&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;" vertex="1" parent="1">
+                    <mxGeometry x="-25" y="370" width="210" height="90" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
