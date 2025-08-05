@@ -180,7 +180,9 @@ def get_OSK_data() -> dict:
         }
     except TypeError:
         # This block only runs if a TypeError occurs in the 'try' block.
-        print("Error: You cannot add a number and a string together.")
+        print("Error: You cannot add a number and a string together." + 
+        "\n You're OSK overlay will fail to work as OSK height cannot be translated into CSS values.")
+
 
 
     return output_dict
