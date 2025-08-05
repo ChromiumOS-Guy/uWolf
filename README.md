@@ -25,7 +25,6 @@ if the browser is too small or too big please send me the output of this:
 * No hardware acceleration (fix coming with mir2.x subsurface support on Noble)
 * Opening uwolf from url dispatcher crashes uwolf, this also affects opening from openstore. (fix coming with mir2.x subsurface support on Noble)
 * Seperate Clipboard (copy/paste) then rest of system (fix coming with mir2.x subsurface support on Noble)
-* uWolf crashes when writing changes to profile (only noticable when updating uWolf, or on second launch of browser), may be fixed further testing required.
 * it_tablet() function is getting blocked by apparmor so uWolf alaways assumes it runs on a phone.
 
 * #### LANDSCAPE Issues:
