@@ -40,7 +40,6 @@ if you want to contribute or check on the progress on the subsurface support go 
 * #### completly turn UI to mobile with userchrome.js settings no UIX element will be spared (please help me if you're good at CSS or JavaScript, its not hard just time consuming work.):
     * add desktop/mobile mode for websites on panelUI settings menu.
     * changes tabbar into a tab drawer.
-    * change the layout of every about: page with custom CSS injection to make it work for mobile.
 
 
 ### License
