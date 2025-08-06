@@ -1,3 +1,4 @@
 defaultPref("webgl.disabled", false);
 defaultPref("privacy.resistFingerprinting", true);
 defaultPref("network.http.referer.XOriginPolicy", 2);
+defaultPref("browser.download.useDownloadDir", true); // make sure downloading files work as intended
