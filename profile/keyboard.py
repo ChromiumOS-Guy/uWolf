@@ -54,7 +54,7 @@ def get_vertical_resolution() -> int:
         # Start the QML process, capturing stdout
         if os.path.exists("/sys/class/drm/"): # drm: direct rendering manager (should be used everywhere)
             process = subprocess.run(
-                "cat /sys/class/drm/*/modes | awk -F 'x' '{print $2}' | sort -nu | tail -n 1",
+                "cat /sys/class/drm/*/modes | awk -F 'x' '{print $2}' | grep -o '[0-9]*' | sort -nu | tail -n 1",
                 shell=True,
                 check=True,
                 capture_output=True,
@@ -62,7 +62,7 @@ def get_vertical_resolution() -> int:
             )
         elif os.path.exists("/sys/class/graphics/"): # virtual framebuffer (depricated in favour of drm, some ubuntu touch ports still use it apperantly)
             process = subprocess.run(
-                "cat /sys/class/graphics/*/modes | awk -F 'x' '{print $2}' | sort -nu | tail -n 1",
+                "cat /sys/class/graphics/*/modes | awk -F 'x' '{print $2}' | grep -o '[0-9]*' | sort -nu | tail -n 1",
                 shell=True,
                 check=True,
                 capture_output=True,
@@ -95,7 +95,7 @@ def get_horizontal_resolution() -> int:
         # Start the QML process, capturing stdout
         if os.path.exists("/sys/class/drm/"): # drm: direct rendering manager (should be used everywhere)
             process = subprocess.run(
-                "cat /sys/class/drm/*/modes | awk -F 'x' '{print $1}' | sort -nu | tail -n 1",
+                "cat /sys/class/drm/*/modes | awk -F 'x' '{print $1}' | grep -o '[0-9]*' | sort -nu | tail -n 1",
                 shell=True,
                 check=True,
                 capture_output=True,
@@ -103,7 +103,7 @@ def get_horizontal_resolution() -> int:
             )
         elif os.path.exists("/sys/class/graphics/"):# virtual framebuffer (depricated in favour of drm, some ubuntu touch ports still use it apperantly)
             process = subprocess.run(
-                "cat /sys/class/graphics/*/modes | awk -F 'x' '{print $1}' | sort -nu | tail -n 1",
+                "cat /sys/class/graphics/*/modes | awk -F 'x' '{print $1}' | grep -o '[0-9]*' | sort -nu | tail -n 1",
                 shell=True,
                 check=True,
                 capture_output=True,
