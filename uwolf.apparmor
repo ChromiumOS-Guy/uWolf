@@ -5,6 +5,13 @@
         "location",
         "keep-display-on"
     ],
+    "read_path": [
+        "/usr/share/maliit/plugins/lomiri-keyboard/keys/key_constants.js",
+        "/sys/class/drm/*/modes",
+        "/sys/class/graphics/*/modes"
+    ],
+    "write_path": [
+        "@{HOME}/Downloads"
+    ],
     "policy_version": 20.04,
-    "template": "unconfined"
 }

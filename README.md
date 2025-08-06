@@ -1,46 +1,9 @@
 # uWolf
+this branch is dedicated to trying to get confinment to work for added security
 
-A UT Wrapper for LibreWolf Firefox Based Browser.
-this is still in early development, help welcome!
+the current problem is getting OSK to work
+and getting dbus daemon ```focus_monitor.py``` to work
 
-It's important to note that without full hardware acceleration, performance isn't stellar, but it's generally good enough for basic Browse without heavy demands.
-
-Youtube Short Demo: https://youtube.com/shorts/BcV9cN1zmVU
-
-## Setup:
-The setup process is straightforward:
- -  Stage 1: On your very first launch, uWolf will download necessary extensions. This takes a moment.
- -  Stage 2: After extensions are ready, a quick restart is needed. This loads the custom mobile UI to make things look right.
-
-It is Important to note that every version update you are encouraged to clear startup cache here: about:support, if there are any problems.
-
-## Support:
-you can either create an Issue on github (faster), or you can ask in the forum [here](https://forums.ubports.com/topic/11060/uwolf-librewolf) (doubles as DEVLOG).
-
-if the browser scaling is too small or too big please send me the output of this:
-```cat /sys/class/drm/card0-DSI-1/modes```  with device name as issue ```getprop ro.product.name```, you are encouraged to provide more details about device.
-
-## Known Issues:
-* OSK takes a bit of time to load due to plugin initalizing last. (not fixable)
-* No hardware acceleration (fix coming with mir2.x subsurface support on Noble)
-* Opening uwolf from url dispatcher crashes uwolf, this also affects opening from openstore. (fix coming with mir2.x subsurface support on Noble)
-* Seperate Clipboard (copy/paste) then rest of system (fix coming with mir2.x subsurface support on Noble)
-
-* #### LANDSCAPE Issues:
-    * Inputs on the right side of the screen do not work in landscape mode (fix coming when [this](https://gitlab.com/ubports/development/core/lomiri/-/merge_requests/207) is merged)
-    * Settings can only be access in portrait mode (fix PROBABLY MAYBE coming with mir2.x subsurface support on Noble) 
-    * Settings not fitting screen in landscape in older versions (might be fixed by [this](https://connect.mozilla.org/t5/discussions/firefox-settings-design-share-your-input/m-p/66629/highlight/true#M23625))
-
-if you want to contribute or check on the progress on the subsurface support go [here](https://gitlab.com/ubports/development/core/qtmir/-/merge_requests/83)
-
-
-
-## TODO:
-* implement url_dispatcher for link opening functionality (requiers fixing bug 3)
-* #### completly turn UI to mobile with userchrome.js settings no UIX element will be spared (please help me if you're good at CSS or JavaScript, its not hard just time consuming work.):
-    * add desktop/mobile mode for websites on panelUI settings menu.
-    * changes tabbar into a tab drawer.
-    * change the layout of every about: page with custom CSS injection to make it work for mobile.
 
 
 ### License

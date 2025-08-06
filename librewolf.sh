@@ -23,7 +23,7 @@ from profile import profile, chrome, librewolf_overrides
 import focus_monitor
 
 
-#### Functions
+#### 
 def get_lcd_density() -> int:
   # getprop vendor.display.lcd_density
   lcd_density = None
@@ -141,6 +141,7 @@ else:
 system_var_dict = {
   "is-tablet" : is_tablet() # 0 for phone 1 for tablet
 }
+username = profile.get_whoami_output() # get username before I override profile lib with a variable name
 profile = profile.get_librewolf_default_profile() # get default profile
 dbus_monitor_thread = None
 dbus_stop_event = None
@@ -177,6 +178,13 @@ os.environ["DISABLE_WAYLAND"] = "1"
 # Force Wayland
 # os.environ["MOZ_ENABLE_WAYLAND"] = "1"
 
+# SET custom home
+if not username:
+  print("cannot run whoami, defaulting to phablet")
+  username = "phablet"
+
+os.environ["HOME"] = "/home/{username}/.config/uwolf.chromiumos-guy".format(username=username) # redirect librewolf to where confined storage is
+
 try:
   if len(sys.argv) > 1:
       url_to_open = sys.argv[1]
@@ -190,6 +198,7 @@ try:
 except:
   pass
 
+os.environ["HOME"] = "/home/{username}".format(username=username) # for sanity, restore to normal as this ENV variable will break a lot of stuff if not set correctly.
 
 # stop dbus monitor
 if dbus_monitor_thread and dbus_monitor_thread.is_alive():

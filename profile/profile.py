@@ -37,7 +37,7 @@ def get_librewolf_default_profile():
         print("Could not determine current user. Exiting.")
         return None, None # Return (None, None) on error
 
-    base_path = os.path.join("/home", username, ".librewolf")
+    base_path = os.path.join("/home", username, ".config", "uwolf.chromiumos-guy",".librewolf")
     profiles_ini_path = os.path.join(base_path, "profiles.ini")
     
     determined_profile_path = None

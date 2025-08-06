@@ -96,5 +96,5 @@ pref('dom.serviceWorkers.enabled', false);
 // enables scrollbar all the time, so you can scroll through finicky af UI (shit for userChrome)
 // from https://connect.mozilla.org/t5/discussions/scrollbars-disappear-in-firefox-100/m-p/19881/highlight/true#M8533
 pref('widget.gtk.overlay-scrollbars.enabled', false);
-pref('widget.non-native-theme.gtk.scrollbar.thumb-size', 1.0);
 pref('widget.non-native-theme.scrollbar.size.override', 15);
+pref('widget.non-native-theme.gtk.scrollbar.thumb-size', 1.0);
