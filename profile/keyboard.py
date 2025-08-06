@@ -53,7 +53,7 @@ def get_vertical_resolution() -> int:
     try:
         # Start the QML process, capturing stdout
         process = subprocess.run(
-            "cat /sys/class/drm/*/modes | awk -F 'x' '{print $2}' | sort -u",
+            "cat /sys/class/drm/*/modes | awk -F 'x' '{print $2}' | sort -nu | tail -n 1",
             shell=True,
             check=True,
             capture_output=True,
@@ -82,7 +82,7 @@ def get_horizontal_resolution() -> int:
     try:
         # Start the QML process, capturing stdout
         process = subprocess.run(
-            "cat /sys/class/drm/*/modes | awk -F 'x' '{print $1}' | sort -u",
+            "cat /sys/class/drm/*/modes | awk -F 'x' '{print $1}' | sort -nu | tail -n 1",
             shell=True,
             check=True,
             capture_output=True,
