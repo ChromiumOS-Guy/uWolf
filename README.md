@@ -17,7 +17,7 @@ It is Important to note that every version update you are encouraged to clear st
 ## Support:
 you can either create an Issue on github (faster), or you can ask in the forum [here](https://forums.ubports.com/topic/11060/uwolf-librewolf) (doubles as DEVLOG).
 
-if the browser is too small or too big please send me the output of this:
+if the browser scaling is too small or too big please send me the output of this:
 ```cat /sys/class/drm/card0-DSI-1/modes```  with device name as issue ```getprop ro.product.name```, you are encouraged to provide more details about device.
 
 ## Known Issues:
