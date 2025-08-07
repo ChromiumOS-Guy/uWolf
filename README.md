@@ -37,6 +37,7 @@ if you want to contribute or check on the progress on the subsurface support go 
 
 ## TODO:
 * add the use of "-CreateProfile" to remove the setup stages completly
+* integrate goodies from [here](https://gitlab.postmarketos.org/postmarketOS/mobile-config-firefox/-/tree/master?ref_type=heads).
 * implement url_dispatcher for link opening functionality (requiers fixing bug 3)
 * #### completly turn UI to mobile with userchrome.js settings no UIX element will be spared (please help me if you're good at CSS or JavaScript, its not hard just time consuming work.):
     * add desktop/mobile mode for websites on panelUI settings menu.
