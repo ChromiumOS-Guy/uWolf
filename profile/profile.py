@@ -25,6 +25,29 @@ def get_whoami_output():
         print("Error: 'whoami' command not found. Make sure it's in your system's PATH.")
         return None
 
+def get_home_dir():
+    """
+    Executes the 'echo $HOME' command and captures its standard output.
+    """
+    try:
+        # subprocess.run is the recommended way to run external commands.
+        # capture_output=True will capture stdout and stderr.
+        # text=True decodes stdout/stderr as text using default encoding.
+        result = subprocess.run(['sh', '-c', 'echo $HOME'], capture_output=True, text=True, check=True)
+
+        # The output is in the .stdout attribute of the result object.
+        # .strip() is used to remove any trailing newline characters.
+        home_dir = result.stdout.strip()
+        return home_dir
+    except subprocess.CalledProcessError as e:
+        # This error is raised if check=True and the command returns a non-zero exit code.
+        print(f"Error executing command: {e}")
+        print(f"Stderr: {e.stderr}")
+        return None
+    except FileNotFoundError:
+        print("Error: 'echo' command failed. Make sure you have a shell in your system's PATH.")
+        return None
+
 
 def get_librewolf_default_profile():
     """
@@ -32,12 +55,12 @@ def get_librewolf_default_profile():
     It does NOT create directories or profiles.ini if they don't exist.
     Returns a tuple: (full_profile_path, profile_name), or (None, None) if not found.
     """
-    username = get_whoami_output()
-    if not username:
-        print("Could not determine current user. Exiting.")
+    home_dir = get_home_dir()
+    if not home_dir:
+        print("Could not determine home directory. Exiting.")
         return None, None # Return (None, None) on error
 
-    base_path = os.path.join("/home", username, ".librewolf")
+    base_path = os.path.join(home_dir, ".librewolf")
     profiles_ini_path = os.path.join(base_path, "profiles.ini")
     
     determined_profile_path = None
@@ -83,6 +106,20 @@ def get_librewolf_default_profile():
                             print(f"Found default profile '{determined_profile_name}' from [{section}] (Default=1): {determined_profile_path}")
                             break
             
+            if not determined_profile_path:  # If still not found
+                # Check for available profiles
+                profiles = [section for section in config.sections() if section.startswith('Profile') and config.has_option(section, 'Path') and config.has_option(section, 'Name')]
+                
+                # If only one profile exists, select it
+                if len(profiles) == 1:
+                    section = profiles[0]
+                    determined_profile_path = os.path.join(base_path, config[section]['Path'])
+                    determined_profile_name = config[section]['Name']
+                    print(f"Only one profile found: '{determined_profile_name}' from [{section}]: {determined_profile_path}")
+                else:
+                    print("No default profile found and multiple profiles exist.")
+                    return None
+
             if determined_profile_path and determined_profile_name:
                 # Ensure the directory exists if it's referenced in profiles.ini
                 # We only check and print, not create, as per the strict requirement.

@@ -141,14 +141,32 @@ else:
 system_var_dict = {
   "is-tablet" : is_tablet() # 0 for phone 1 for tablet
 }
-profile = profile.get_librewolf_default_profile() # get default profile
+username = profile.get_whoami_output() # get username
+if not username: # ensure username is not empty
+  print("failed to find username defualting to phablet")
+  username = "phablet"
+
+current_profile = profile.get_librewolf_default_profile() # get default profile
+if not current_profile or not current_profile[0]: # try to create a default profile if it is not present.
+  print("profile not found, trying to create a new profile")
+  try:
+      # Use subprocess to create the profile
+      result = subprocess.run(
+          ["bin/AppRun", "-CreateProfile", username, "--headless"],
+          check=True  # This will raise an exception if the command fails
+      )
+      print("Profile created successfully.")
+      current_profile = profile.get_librewolf_default_profile()
+  except subprocess.CalledProcessError as e: # handle exception
+      print("An error occurred while trying to create the profile:", e)
+
 dbus_monitor_thread = None
 dbus_stop_event = None
 
 if is_usage_mode_staged():
-  chrome.INIT_CHROME(profile, system_var_dict) # copy custom css for adapting UI to default profile and read keyboard
-  librewolf_overrides.copy_librewolf_overrides_cfg(profile) # copy librewolf settings overrides
-  thread_obj, event_obj = focus_monitor.monitor_dbus_and_write_to_file(profile) # run monitor for osk focus pid in dbus
+  chrome.INIT_CHROME(current_profile, system_var_dict) # copy custom css for adapting UI to default profile and read keyboard
+  librewolf_overrides.copy_librewolf_overrides_cfg(current_profile) # copy librewolf settings overrides
+  thread_obj, event_obj = focus_monitor.monitor_dbus_and_write_to_file(current_profile) # run monitor for osk focus pid in dbus
   # Assign them to global/module-level variables
   if thread_obj and event_obj: # Check if the function returned valid objects
       dbus_monitor_thread = thread_obj
@@ -158,8 +176,8 @@ if is_usage_mode_staged():
   else:
       print("Failed to initialize D-Bus monitor thread.")
 else:
-  chrome.delete(profile) # attempt to delete custom chrome files, so browser works unmodifed
-  librewolf_overrides.copy_librewolf_overrides_cfg(profile, False) # copy librewolf settings overrides (True if Staged mode)
+  chrome.delete(current_profile) # attempt to delete custom chrome files, so browser works unmodifed
+  librewolf_overrides.copy_librewolf_overrides_cfg(current_profile, False) # copy librewolf settings overrides (True if Staged mode)
 
 
 #### librewolf stuff
