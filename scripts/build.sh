@@ -23,6 +23,8 @@ echo "--->logging at " + `/bin/date +"%Y-%m-%d_%H-%M-%S"` >> $LOG_FILE
 echo "--->managing files" >> $LOG_FILE
 /bin/cp $ROOT/* $BUILD_DIR 2>/dev/null >> $LOG_FILE
 
+/bin/cp $ROOT/assets/uwolf-logo.png $BUILD_DIR 2>/dev/null >> $LOG_FILE # copy uwolf logo into click package
+
 /bin/sed -i "s/@CLICK_ARCH@/${ARCH_TRIPLET}/" ${BUILD_DIR}/librewolf.sh >> $LOG_FILE # change arch for launch script
 
 /bin/cp -rn $BUILD_DIR/usr/lib/* $INSTALL_DIR/lib 2>/dev/null >> $LOG_FILE # copy maliit libs to install dir

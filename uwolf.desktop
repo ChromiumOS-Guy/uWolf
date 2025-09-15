@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=uWolf
 Exec=librewolf.sh %u
-Icon=bin/librewolf.png
+Icon=uwolf-logo.png
 Terminal=false
 Type=Application
 X-Lomiri-Touch=true
