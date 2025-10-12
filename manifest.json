@@ -9,7 +9,7 @@
       "desktop": "uwolf.desktop"
     }
   },
-  "version": "0.11.37",
+  "version": "0.11.38",
   "maintainer": "ChromiumOS-Guy <email@domain.org>",
   "framework": "@CLICK_FRAMEWORK@"
 }

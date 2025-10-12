@@ -7,7 +7,7 @@ FAIL_MOVING=2
 
 ## crackle tool
 ${ROOT}/crackle/crackle update
-${ROOT}/crackle/crackle click maliit-inputcontext-gtk3
+${ROOT}/crackle/crackle click maliit-inputcontext-gtk3 libavcodec58
 
 
 ## export
