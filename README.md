@@ -1,3 +1,8 @@
+# NOTE:
+Librewolf is currently out of maintance, I am actively working on xdg-desktop-portal-lomiri so ALL programs who use xdg portals will be integrated with UT from notifications to file picking. as you can guess it is very hard to do and I feel that continuing to maintain the browser with patches which I'm actively working on making irrelvant is not a good use of my time.
+
+uWolf is not dead! I have big plans. but first please let me make it so we can all open a damn file on desktop[ programs without resorting to hacky patches.
+
 # uWolf
 
 A UT Wrapper for LibreWolf Firefox Based Browser.
